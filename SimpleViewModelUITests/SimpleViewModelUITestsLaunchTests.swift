@@ -1,9 +1,4 @@
-//
-//  SimpleViewModelUITestsLaunchTests.swift
-//  SimpleViewModelUITests
-//
-//  Created by Eric Chamberlain on 11/4/23.
-//
+/// Copyright ⓒ 2023 Bithead LLC. All rights reserved.
 
 import XCTest
 
