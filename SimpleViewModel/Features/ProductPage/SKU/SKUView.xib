@@ -43,7 +43,7 @@
                                 <constraint firstAttribute="width" constant="120" id="73f-uj-Jgh"/>
                             </constraints>
                             <state key="normal" title="Button"/>
-                            <buttonConfiguration key="configuration" style="plain" title="Button"/>
+                            <buttonConfiguration key="configuration" style="plain" title="Add"/>
                             <connections>
                                 <action selector="didTapAddButton:" destination="-1" eventType="touchUpInside" id="lc4-0j-eoF"/>
                             </connections>

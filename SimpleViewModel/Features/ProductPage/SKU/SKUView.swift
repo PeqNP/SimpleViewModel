@@ -8,7 +8,6 @@ protocol SKUViewDelegate: AnyObject {
 }
 
 class SKUView: UIView {
-
     @IBOutlet weak var colorLabel: UILabel!
     @IBOutlet weak var priceLabel: UILabel!
     @IBOutlet weak var addButton: UIButton!
@@ -30,14 +29,14 @@ class SKUView: UIView {
     func configure(with sku: SKU) {
         interface = .init(viewModel: .init(sku: sku))
 
-        colorLabel.text = sku.color.name
-        priceLabel.text = sku.price.toString
-
         interface.receive { [weak self] output in
             // Let parent know our current state
             self?.delegate?.receive(output)
             
             switch output {
+            case let .loaded(state):
+                self?.colorLabel.text = state.color
+                self?.priceLabel.text = state.price
             case .addedToBag:
                 // TODO: Display a checkmark on the 'Add' button
                 break

@@ -19,15 +19,31 @@
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="oOY-WW-Ynp">
                                 <rect key="frame" x="20" y="79" width="353" height="719"/>
                                 <subviews>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Product Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zVh-py-rVg">
+                                    <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MNx-zA-SY3">
                                         <rect key="frame" x="0.0" y="0.0" width="353" height="60"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="60" id="0dg-zW-Xaj"/>
-                                        </constraints>
-                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="22"/>
-                                        <nil key="textColor"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Product Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zVh-py-rVg">
+                                                <rect key="frame" x="0.0" y="0.0" width="233" height="60"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="60" id="0dg-zW-Xaj"/>
+                                                </constraints>
+                                                <fontDescription key="fontDescription" type="boldSystem" pointSize="22"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6c1-Fc-wLS">
+                                                <rect key="frame" x="233" y="0.0" width="120" height="60"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="120" id="KMO-sK-0jD"/>
+                                                </constraints>
+                                                <state key="normal" title="Button"/>
+                                                <buttonConfiguration key="configuration" style="plain" title="Like"/>
+                                                <connections>
+                                                    <action selector="didTapLikeButton:" destination="Y6W-OH-hqX" eventType="touchUpInside" id="bT5-x3-T6q"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                    </stackView>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Price" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6Qf-BC-vtW">
                                         <rect key="frame" x="0.0" y="60" width="353" height="24"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="20"/>
@@ -78,6 +94,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="likeButton" destination="6c1-Fc-wLS" id="TTR-Fu-oEZ"/>
                         <outlet property="productNameLabel" destination="zVh-py-rVg" id="IFm-Mp-CER"/>
                         <outlet property="productPriceLabel" destination="6Qf-BC-vtW" id="NWx-cD-PfT"/>
                         <outlet property="skusStackView" destination="NuO-Vu-k1e" id="A2r-00-zTa"/>

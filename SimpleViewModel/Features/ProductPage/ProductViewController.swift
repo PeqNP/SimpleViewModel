@@ -20,8 +20,10 @@ class ProductViewController: UIViewController {
         }
     }
     @IBOutlet weak var toastLabel: UILabel!
+    @IBOutlet weak var likeButton: UIButton!
     
-    private var interface: ViewModelInterface<ProductViewModel>!
+    // If no configuration is required by view model, instantiate here. It may be necessary to instantiate this in `configure` or even `viewDidLoad`. It's up to you.
+    private let interface: ViewModelInterface<ProductViewModel> = .init(viewModel: .init())
 
     private var productID: ProductID!
 
@@ -32,20 +34,20 @@ class ProductViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Creating the ViewModel must be done in viewDidLoad so that no view signals are lost
-        interface = .init(viewModel: .init())
+        // Receive before any signals are sent! This ensures no view signal is lost.
         interface.receive { [weak self] msg in
             switch msg {
             case let .showError(error):
                 self?.showError(error)
                 break
-            case let .loadedProduct(product):
-                self?.updateView(with: product)
+            case let .update(state):
+                self?.updateView(with: state)
                 break
             case .addedToBag:
                 self?.showAddedToBag()
             }
         }
+
         interface.send(.loadProduct(id: productID))
     }
 
@@ -54,10 +56,18 @@ class ProductViewController: UIViewController {
         toastView.isHidden = false
     }
 
-    private func updateView(with product: Product) {
-        productNameLabel.text = product.name
-        productPriceLabel.text = product.price.toString
-        for sku in product.skus {
+    private func updateView(with state: ProductViewModel.ViewState) {
+        productNameLabel.text = state.productName
+        productPriceLabel.text = state.productPrice
+        if state.isLiked {
+            likeButton.setTitle("Liked", for: .normal)
+        }
+        else {
+            likeButton.setTitle("Like", for: .normal)
+        }
+
+        // This should be changed. There should be no reason to re-draw these.
+        for sku in state.skus {
             let view = SKUView()
             view.awakeFromNib()
             view.configure(with: sku)
@@ -75,6 +85,10 @@ class ProductViewController: UIViewController {
     @objc
     private func didTapToast(_ sender: Any) {
         toastView.isHidden = true
+    }
+
+    @IBAction func didTapLikeButton(_ sender: Any) {
+        interface.send(.didTapLike)
     }
 }
 

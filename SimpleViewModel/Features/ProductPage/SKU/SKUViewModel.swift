@@ -3,11 +3,17 @@
 import Foundation
 
 struct SKUViewModel: ViewModel {
+    struct ViewState: Equatable {
+        let color: String
+        let price: String
+    }
+
     enum Input {
         case addToBag
     }
 
     enum Output {
+        case loaded(ViewState)
         case addedToBag(SKU)
     }
 
@@ -15,6 +21,13 @@ struct SKUViewModel: ViewModel {
 
     init(sku: SKU) {
         self.sku = sku
+    }
+
+    func first(respond: (Output) -> Void) {
+        respond(.loaded(.init(
+            color: sku.color.name,
+            price: sku.price.toString)
+        ))
     }
 
     func accept(_ input: Input, respond: (Output) -> Void) {

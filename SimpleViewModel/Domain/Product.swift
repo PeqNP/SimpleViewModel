@@ -2,7 +2,7 @@
 
 import Foundation
 
-enum Price {
+enum Price: Equatable {
     case regular(Double)
     case sale(was: Double, now: Double)
 
@@ -25,7 +25,7 @@ enum Price {
     }
 }
 
-enum NormalPrice {
+enum NormalPrice: Equatable {
     case single(Price)
     case range(from: Price, to: Price)
 
@@ -39,41 +39,26 @@ enum NormalPrice {
     }
 }
 
-struct Product {
+struct Product: Equatable {
     let id: ProductID
     let name: String
     let price: NormalPrice
     let skus: [SKU]
 }
 
-struct SKUColor {
+struct SKUColor: Equatable {
     let name: String
     let imageURL: URL?
 }
 
-struct SKUSize {
+struct SKUSize: Equatable {
     let name: String
     let metaDescription: String?
 }
 
-struct SKU {
+struct SKU: Equatable {
     let id: SKUID
     let color: SKUColor
     let size: SKUSize
     let price: Price
-}
-
-extension SKUSize: Equatable {
-
-    public static func ==(lhs: SKUSize, rhs: SKUSize) -> Bool {
-        return lhs.name == rhs.name
-            && lhs.metaDescription == rhs.metaDescription
-    }
-}
-extension SKUColor: Equatable {
-
-    public static func ==(lhs: SKUColor, rhs: SKUColor) -> Bool {
-        return lhs.name == rhs.name
-            && lhs.imageURL == rhs.imageURL
-    }
 }

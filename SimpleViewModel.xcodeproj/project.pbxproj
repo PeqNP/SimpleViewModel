@@ -17,7 +17,6 @@
 		5A237BA42AF66097006C64DB /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A237BA32AF66097006C64DB /* ViewModel.swift */; };
 		5A237BA72AF660E8006C64DB /* ProductViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A237BA62AF660E8006C64DB /* ProductViewModel.swift */; };
 		5A237BAB2AF66160006C64DB /* Product.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A237BAA2AF66160006C64DB /* Product.swift */; };
-		5A237BAD2AF66166006C64DB /* ShippingInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A237BAC2AF66166006C64DB /* ShippingInfo.swift */; };
 		5A237BAF2AF66179006C64DB /* Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A237BAE2AF66179006C64DB /* Types.swift */; };
 		5A237BB12AF661A5006C64DB /* ProductViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A237BB02AF661A5006C64DB /* ProductViewController.swift */; };
 		5A237BB32AF66855006C64DB /* ViewModelInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A237BB22AF66855006C64DB /* ViewModelInterface.swift */; };
@@ -62,7 +61,6 @@
 		5A237BA32AF66097006C64DB /* ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
 		5A237BA62AF660E8006C64DB /* ProductViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductViewModel.swift; sourceTree = "<group>"; };
 		5A237BAA2AF66160006C64DB /* Product.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Product.swift; sourceTree = "<group>"; };
-		5A237BAC2AF66166006C64DB /* ShippingInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShippingInfo.swift; sourceTree = "<group>"; };
 		5A237BAE2AF66179006C64DB /* Types.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Types.swift; sourceTree = "<group>"; };
 		5A237BB02AF661A5006C64DB /* ProductViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductViewController.swift; sourceTree = "<group>"; };
 		5A237BB22AF66855006C64DB /* ViewModelInterface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModelInterface.swift; sourceTree = "<group>"; };
@@ -194,7 +192,6 @@
 			isa = PBXGroup;
 			children = (
 				5A237BAA2AF66160006C64DB /* Product.swift */,
-				5A237BAC2AF66166006C64DB /* ShippingInfo.swift */,
 				5A237BAE2AF66179006C64DB /* Types.swift */,
 			);
 			path = Domain;
@@ -362,7 +359,6 @@
 				5A237BA72AF660E8006C64DB /* ProductViewModel.swift in Sources */,
 				5A237B782AF65FC9006C64DB /* SimpleViewModelApp.swift in Sources */,
 				5A237BB12AF661A5006C64DB /* ProductViewController.swift in Sources */,
-				5A237BAD2AF66166006C64DB /* ShippingInfo.swift in Sources */,
 				5A237BC22AF68197006C64DB /* ProductViewController+SwiftUI.swift in Sources */,
 				5A237BB32AF66855006C64DB /* ViewModelInterface.swift in Sources */,
 			);
