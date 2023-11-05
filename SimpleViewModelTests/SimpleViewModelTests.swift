@@ -4,6 +4,32 @@ import XCTest
 
 @testable import SimpleViewModel
 
+struct FooViewModel: ViewModel {
+    enum Input {
+        case didTapButton
+    }
+
+    enum Output: Equatable {
+        case state(State)
+    }
+
+    struct State: Equatable {
+        let id: String
+        let name: String
+    }
+
+    func first(respond: (Output) -> Void) {
+        respond(.state(.init(id: "5", name: "Foo")))
+    }
+
+    func accept(_ input: Input, respond: @escaping (Output) -> Void) {
+        switch input {
+        case .didTapButton:
+            respond(.state(.init(id: "10", name: "Bar")))
+        }
+    }
+}
+
 final class SimpleViewModelTests: XCTestCase {
 
     override func setUpWithError() throws { }
@@ -11,31 +37,19 @@ final class SimpleViewModelTests: XCTestCase {
     override func tearDownWithError() throws { }
 
     func testViewModel() throws {
-        /**
-         I would like something as the following:
-         
-         // This will initialize the tester and also ensure that `first` signals are accounted for.
-         // If no expectations are provided, they are still checked against, and the test will fail immediately if the `first` logic is not tested against.
-         let tester = TestViewModelInterface(viewModel: MyViewModel(), expect: [
-            .viewState(SomeViewState())
-         ])
-         
-         // TODO: Stub a network request
-         // If a network request is not stubbed, the test should fail immediately with an error saying that the function is not stubbed.
-         
-         tester.send(.didTapLikeButton, expect: [
-            .addedToBag(SKU()),
-            .analytic(SomeAnalyticEvent())
-         ])
-         
-         Stubbing of network requests still needs to be figured out. If it's possible to replace the real instance's function, that might work. No network requests should ever be made at test time though.
-         */
-    }
+        let tester = TestViewModelInterface(viewModel: FooViewModel())
 
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        measure {
-            // Put the code you want to measure the time of here.
-        }
+        tester.expect([
+            .state(.init(id: "5", name: "Foo"))
+        ])
+
+        // TODO: Perform network request
+
+        tester.send(.didTapButton).expect([
+            .state(.init(id: "10", name: "Bar"))
+        ])
+
+        // This isn't entirely necessary. If the value from the `send` function is unused, a compiler warning will show, making it immediately obvious that it is missing an expectation.
+        tester.finish()
     }
 }

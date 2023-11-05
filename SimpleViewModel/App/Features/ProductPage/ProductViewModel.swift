@@ -25,11 +25,11 @@ class ProductViewModel: ViewModel {
         case sku(SKUViewModel.Output)
     }
 
-    enum Output {
+    enum Output: Equatable {
         case viewState(ViewState)
         case skus([SKU])
         case addedToBag
-        case showError(Error)
+        case showError(AppError)
     }
     
     /// This is not required. It is a convenient way to encapsulate the interal state of the `ViewModel`.
@@ -62,7 +62,7 @@ class ProductViewModel: ViewModel {
                     respond(.skus(product.skus))
                 }
                 .catch { error in
-                    respond(.showError(error))
+                    respond(.showError(AppError(error)))
                 }
         case .didTapLike:
             // TODO: Make network request to like `Product`

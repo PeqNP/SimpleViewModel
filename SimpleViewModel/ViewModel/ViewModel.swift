@@ -4,7 +4,7 @@ import Foundation
 
 protocol ViewModel<Input, Output> {
     associatedtype Input
-    associatedtype Output
+    associatedtype Output: Equatable
 
     /// Allows the `ViewModel` to send a signal before any events may be accepted. This can be used to populate the default state of the view.
     func first(respond: (Output) -> Void)

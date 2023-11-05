@@ -12,7 +12,7 @@ struct SKUViewModel: ViewModel {
         case addToBag
     }
 
-    enum Output {
+    enum Output: Equatable {
         case viewState(ViewState)
         case addedToBag(SKU)
     }
