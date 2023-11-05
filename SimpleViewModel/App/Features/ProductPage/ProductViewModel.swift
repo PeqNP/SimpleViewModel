@@ -51,7 +51,6 @@ class ProductViewModel: ViewModel {
     
     var state: State = .empty
 
-    // Should a state be provided? This would allow a transform to be placed on top of view state. Ideally we would want to prevent updates to the page if the state is the same. IMO, this allows the implementation to be very sloppy. There's no way to ensure you're making only one call to the backend, etc.
     func accept(_ input: Input, respond: @escaping (Output) -> Void) {
         switch input {
         case let .loadProduct(id):
