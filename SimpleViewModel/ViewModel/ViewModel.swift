@@ -14,7 +14,7 @@ protocol ViewModel<Input, Output> {
     func filter(output: Output) -> ViewState?
     
     /// Accept an input from the consumer and respond in kind.
-    func accept(_ input: Input, respond: (Output) -> Void)
+    func accept(_ input: Input, respond: @escaping (Output) -> Void)
 }
 
 extension ViewModel {

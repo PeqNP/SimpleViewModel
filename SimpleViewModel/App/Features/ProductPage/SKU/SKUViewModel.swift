@@ -30,7 +30,7 @@ struct SKUViewModel: ViewModel {
         ))
     }
 
-    func accept(_ input: Input, respond: (Output) -> Void) {
+    func accept(_ input: Input, respond: @escaping (Output) -> Void) {
         switch input {
         case .addToBag:
             /**

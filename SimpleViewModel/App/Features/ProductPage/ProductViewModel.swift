@@ -2,7 +2,7 @@
 
 import Foundation
 
-class ProductViewModel: ViewModel {
+class ProductViewModel: ViewModel {    
     struct ViewState: Equatable {
         var productName: String
         var productPrice: String
@@ -21,12 +21,11 @@ class ProductViewModel: ViewModel {
     
     /// This is not required. It is a convenient way to encapsulate the interal state of the `ViewModel`.
     struct State {
-        var productId: ProductID
         var product: Product
         var isLiked: Bool
 
         static var empty: State {
-            .init(productId: "0", product: .empty, isLiked: false)
+            .init(product: .empty, isLiked: false)
         }
     }
 
@@ -44,6 +43,8 @@ class ProductViewModel: ViewModel {
         case showError(Error)
     }
 
+    @Dependency var productProvider: ProductProvider!
+    
     var state: State = .empty
 
     func filter(output: Output) -> ViewState? {
@@ -54,18 +55,16 @@ class ProductViewModel: ViewModel {
     }
 
     // Should a state be provided? This would allow a transform to be placed on top of view state. Ideally we would want to prevent updates to the page if the state is the same. IMO, this allows the implementation to be very sloppy. There's no way to ensure you're making only one call to the backend, etc.
-    func accept(_ input: Input, respond: (Output) -> Void) {
+    func accept(_ input: Input, respond: @escaping (Output) -> Void) {
         switch input {
         case let .loadProduct(id):
-            state.productId = id
-            // TODO: Make network request to load `Product`
-            state.product = .init(
-                id: id,
-                name: "Name",
-                price: .single(.regular(10)),
-                skus: []
-            )
-            respond(.update(.make(from: state)))
+            productProvider.product(for: id)
+                .done { [weak self] product in
+                    self?.updateProduct(product, and: respond)
+                }
+                .catch { error in
+                    respond(.showError(error))
+                }
         case .didTapLike:
             // TODO: Make network request to like `Product`
             state.isLiked = !state.isLiked
@@ -79,5 +78,10 @@ class ProductViewModel: ViewModel {
                 break
             }
         }
+    }
+    
+    private func updateProduct(_ product: Product, and respond: (Output) -> Void) {
+        state.product = product
+        respond(.update(.make(from: state)))
     }
 }

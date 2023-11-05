@@ -1,0 +1,41 @@
+PODS:
+  - Alamofire (5.8.0)
+  - KIF (3.7.8):
+    - KIF/Core (= 3.7.8)
+  - KIF/Core (3.7.8)
+  - KIF/IdentifierTests (3.7.8):
+    - KIF/Core
+  - PromiseKit (8.1.1):
+    - PromiseKit/CorePromise (= 8.1.1)
+    - PromiseKit/Foundation (= 8.1.1)
+    - PromiseKit/UIKit (= 8.1.1)
+  - PromiseKit/CorePromise (8.1.1)
+  - PromiseKit/Foundation (8.1.1):
+    - PromiseKit/CorePromise
+  - PromiseKit/UIKit (8.1.1):
+    - PromiseKit/CorePromise
+  - Swinject (2.6.2)
+
+DEPENDENCIES:
+  - Alamofire (~> 5.4)
+  - KIF (= 3.7.8)
+  - KIF/IdentifierTests (= 3.7.8)
+  - PromiseKit (~> 8)
+  - Swinject (= 2.6.2)
+
+SPEC REPOS:
+  trunk:
+    - Alamofire
+    - KIF
+    - PromiseKit
+    - Swinject
+
+SPEC CHECKSUMS:
+  Alamofire: 0e92e751b3e9e66d7982db43919d01f313b8eb91
+  KIF: 52e1af1a78cf6fe4ec6777b14776f3dd2eccc32e
+  PromiseKit: d1be44b474e5acfa16adf007a1f49f104e10fead
+  Swinject: cf7458774b1b00323080a9c67e47a1ee7f9d2af1
+
+PODFILE CHECKSUM: bbd32d13000d311f77081bb0bb1e049e7b014641
+
+COCOAPODS: 1.12.1

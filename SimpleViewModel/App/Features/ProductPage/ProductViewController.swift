@@ -66,7 +66,9 @@ class ProductViewController: UIViewController {
             likeButton.setTitle("Like", for: .normal)
         }
 
-        // This should be changed. There should be no reason to re-draw these.
+        // SKUs do not necessarily need to be part of the `ViewState`. For example, when changing the "Like" button status, is it really necessary to redraw all of the `SKUView`s? No. These could be two separate signals. OR, an alternative is to do this only once.
+        skusStackView.removeAllArrangedSubviews()
+        
         for sku in state.skus {
             let view = SKUView()
             view.awakeFromNib()
