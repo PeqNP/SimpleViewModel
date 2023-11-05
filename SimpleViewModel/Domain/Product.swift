@@ -44,6 +44,10 @@ struct Product: Equatable {
     let name: String
     let price: NormalPrice
     let skus: [SKU]
+    
+    static var empty: Product {
+        .init(id: "0", name: "", price: .single(.regular(0)), skus: [])
+    }
 }
 
 struct SKUColor: Equatable {

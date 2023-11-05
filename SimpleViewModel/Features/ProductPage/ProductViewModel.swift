@@ -8,9 +8,25 @@ class ProductViewModel: ViewModel {
         var productPrice: String
         var isLiked: Bool
         var skus: [SKU]
+        
+        static func make(from state: State) -> Self {
+            .init(
+                productName: state.product.name,
+                productPrice: state.product.price.toString,
+                isLiked: state.isLiked,
+                skus: state.product.skus
+            )
+        }
+    }
+    
+    /// This is not required. It is a convenient way to encapsulate the interal state of the `ViewModel`.
+    struct State {
+        var productId: ProductID
+        var product: Product
+        var isLiked: Bool
 
-        static var empty: ViewState {
-            .init(productName: "", productPrice: "", isLiked: false, skus: [])
+        static var empty: State {
+            .init(productId: "0", product: .empty, isLiked: false)
         }
     }
 
@@ -28,9 +44,9 @@ class ProductViewModel: ViewModel {
         case showError(Error)
     }
 
-    var state: ViewState = .empty
+    var state: State = .empty
 
-    func limit(output: Output) -> ViewState? {
+    func filter(output: Output) -> ViewState? {
         switch output {
         case let .update(viewState): return viewState
         default: return nil
@@ -41,15 +57,19 @@ class ProductViewModel: ViewModel {
     func accept(_ input: Input, respond: (Output) -> Void) {
         switch input {
         case let .loadProduct(id):
-            print("Product ID: \(id)")
-            // TODO: Make network request to load `Product` and tranform into `ViewState`.
-            state.productName = "Name"
-            state.productPrice = "$10.00"
-            respond(.update(state))
+            state.productId = id
+            // TODO: Make network request to load `Product`
+            state.product = .init(
+                id: id,
+                name: "Name",
+                price: .single(.regular(10)),
+                skus: []
+            )
+            respond(.update(.make(from: state)))
         case .didTapLike:
             // TODO: Make network request to like `Product`
             state.isLiked = !state.isLiked
-            respond(.update(state))
+            respond(.update(.make(from: state)))
         case let .sku(msg):
             switch msg {
             case .addedToBag:

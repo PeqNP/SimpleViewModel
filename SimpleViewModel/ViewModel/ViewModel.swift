@@ -7,16 +7,20 @@ protocol ViewModel<Input, Output> {
     associatedtype Input
     associatedtype Output
 
-    // Provides a way to determine if an `Output` signal should be sent if the `ViewState` is different than the last state.
-    func limit(output: Output) -> ViewState?
-    func accept(_ input: Input, respond: (Output) -> Void)
+    /// Allows the `ViewModel` to send a signal before any events may be accepted. This can be used to populate the default state of the view.
     func first(respond: (Output) -> Void)
+    
+    /// Provides a way to filter an `Output` signal that provides a `ViewState`. If a `ViewState` is provided, and the `ViewState` is the same as the previous state, no signal will be sent to the consumer.
+    func filter(output: Output) -> ViewState?
+    
+    /// Accept an input from the consumer and respond in kind.
+    func accept(_ input: Input, respond: (Output) -> Void)
 }
 
 extension ViewModel {
-    // Not every view model wishes to check for state
-    func limit(output: Output) -> ViewState? { return nil }
+    /// Not every view model wishes to filter for state
+    func filter(output: Output) -> ViewState? { return nil }
 
-    // Not every view model wishes to respond to the first event
+    /// Not every view model wishes to respond before signals can be sent
     func first(respond: (Output) -> Void) { }
 }
