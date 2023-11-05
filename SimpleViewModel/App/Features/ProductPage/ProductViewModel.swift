@@ -68,8 +68,8 @@ class ProductViewModel: ViewModel {
             // TODO: Make network request to like `Product`
             state.isLiked = !state.isLiked
             respond(.viewState(.make(from: state)))
-        case let .sku(msg):
-            switch msg {
+        case let .sku(output):
+            switch output {
             case .addedToBag:
                 respond(.addedToBag)
                 break

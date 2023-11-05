@@ -11,6 +11,8 @@ class ViewModelInterface<T: ViewModel> {
     init(viewModel: T, receive: @escaping (T.Output) -> Void) {
         self.viewModel = viewModel
         self.callback = receive
+        
+        viewModel.first(respond: respond)
     }
 
     func send(_ input: T.Input) {
