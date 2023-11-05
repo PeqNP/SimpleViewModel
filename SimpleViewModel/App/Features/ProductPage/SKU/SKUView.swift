@@ -27,20 +27,20 @@ class SKUView: UIView {
     }
 
     func configure(with sku: SKU) {
-        interface = .init(viewModel: .init(sku: sku))
-
-        interface.receive { [weak self] output in
-            // Let parent know our current state
-            self?.delegate?.receive(output)
-            
-            switch output {
-            case let .loaded(state):
-                self?.colorLabel.text = state.color
-                self?.priceLabel.text = state.price
-            case .addedToBag:
-                // TODO: Display a checkmark on the 'Add' button
-                break
-            }
+        interface = .init(viewModel: .init(sku: sku), receive: receive)
+    }
+    
+    private func receive(output: SKUViewModel.Output) {
+        // Let parent know our current state
+        delegate?.receive(output)
+        
+        switch output {
+        case let .viewState(state):
+            colorLabel.text = state.color
+            priceLabel.text = state.price
+        case .addedToBag:
+            // TODO: Display a checkmark on the 'Add' button
+            break
         }
     }
 

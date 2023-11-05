@@ -13,7 +13,7 @@ struct SKUViewModel: ViewModel {
     }
 
     enum Output {
-        case loaded(ViewState)
+        case viewState(ViewState)
         case addedToBag(SKU)
     }
 
@@ -24,7 +24,7 @@ struct SKUViewModel: ViewModel {
     }
 
     func first(respond: (Output) -> Void) {
-        respond(.loaded(.init(
+        respond(.viewState(.init(
             color: sku.color.name,
             price: sku.price.toString)
         ))
