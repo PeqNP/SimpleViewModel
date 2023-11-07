@@ -35,6 +35,8 @@
 		A26295C62AFAAE4800DFBAE1 /* Cart.swift in Sources */ = {isa = PBXBuildFile; fileRef = A26295C52AFAAE4800DFBAE1 /* Cart.swift */; };
 		A26295C82AFAAF5A00DFBAE1 /* FeatureFlags.swift in Sources */ = {isa = PBXBuildFile; fileRef = A26295C72AFAAF5A00DFBAE1 /* FeatureFlags.swift */; };
 		A26295CB2AFAC8D900DFBAE1 /* TestWaiter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A26295C92AFAC8D200DFBAE1 /* TestWaiter.swift */; };
+		A26295CD2AFACDA700DFBAE1 /* Debouncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A26295CC2AFACDA700DFBAE1 /* Debouncer.swift */; };
+		A26295D12AFAD37D00DFBAE1 /* Array+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A26295D02AFAD37D00DFBAE1 /* Array+Extensions.swift */; };
 		A28417BF2AF73F0500589D77 /* ProductService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A28417BE2AF73F0500589D77 /* ProductService.swift */; };
 		A28417C82AF7468500589D77 /* Assembly.swift in Sources */ = {isa = PBXBuildFile; fileRef = A28417C72AF7468500589D77 /* Assembly.swift */; };
 		A28417CC2AF7473C00589D77 /* Dependency.swift in Sources */ = {isa = PBXBuildFile; fileRef = A28417CB2AF7473C00589D77 /* Dependency.swift */; };
@@ -92,6 +94,8 @@
 		A26295C52AFAAE4800DFBAE1 /* Cart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cart.swift; sourceTree = "<group>"; };
 		A26295C72AFAAF5A00DFBAE1 /* FeatureFlags.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureFlags.swift; sourceTree = "<group>"; };
 		A26295C92AFAC8D200DFBAE1 /* TestWaiter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestWaiter.swift; sourceTree = "<group>"; };
+		A26295CC2AFACDA700DFBAE1 /* Debouncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Debouncer.swift; sourceTree = "<group>"; };
+		A26295D02AFAD37D00DFBAE1 /* Array+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Extensions.swift"; sourceTree = "<group>"; };
 		A28417BE2AF73F0500589D77 /* ProductService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductService.swift; sourceTree = "<group>"; };
 		A28417C72AF7468500589D77 /* Assembly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Assembly.swift; sourceTree = "<group>"; };
 		A28417CB2AF7473C00589D77 /* Dependency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dependency.swift; sourceTree = "<group>"; };
@@ -207,6 +211,7 @@
 				A26295C92AFAC8D200DFBAE1 /* TestWaiter.swift */,
 				5A237BA32AF66097006C64DB /* ViewModel.swift */,
 				5A237BB22AF66855006C64DB /* ViewModelInterface.swift */,
+				A26295CC2AFACDA700DFBAE1 /* Debouncer.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -283,10 +288,10 @@
 		A28417C52AF7415A00589D77 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				5A237BAA2AF66160006C64DB /* Product.swift */,
-				5A237BAE2AF66179006C64DB /* Types.swift */,
 				A26295C52AFAAE4800DFBAE1 /* Cart.swift */,
 				A26295C72AFAAF5A00DFBAE1 /* FeatureFlags.swift */,
+				5A237BAA2AF66160006C64DB /* Product.swift */,
+				5A237BAE2AF66179006C64DB /* Types.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -301,8 +306,9 @@
 		A28417C92AF7471800589D77 /* Foundation */ = {
 			isa = PBXGroup;
 			children = (
-				A28417CB2AF7473C00589D77 /* Dependency.swift */,
 				5A7D9EB22AF7F01F00259341 /* AppError.swift */,
+				A26295D02AFAD37D00DFBAE1 /* Array+Extensions.swift */,
+				A28417CB2AF7473C00589D77 /* Dependency.swift */,
 			);
 			path = Foundation;
 			sourceTree = "<group>";
@@ -544,6 +550,7 @@
 				A26295C82AFAAF5A00DFBAE1 /* FeatureFlags.swift in Sources */,
 				5A237BAB2AF66160006C64DB /* Product.swift in Sources */,
 				5A237BAF2AF66179006C64DB /* Types.swift in Sources */,
+				A26295CD2AFACDA700DFBAE1 /* Debouncer.swift in Sources */,
 				5A237BC02AF67009006C64DB /* SKUViewModel.swift in Sources */,
 				A28417CE2AF74CD200589D77 /* UIStackView+Extensions.swift in Sources */,
 				A26295C62AFAAE4800DFBAE1 /* Cart.swift in Sources */,
@@ -551,6 +558,7 @@
 				A26295C42AFAAC2300DFBAE1 /* CheckoutService.swift in Sources */,
 				5A237BA72AF660E8006C64DB /* ProductViewModel.swift in Sources */,
 				5A237B782AF65FC9006C64DB /* SimpleViewModelApp.swift in Sources */,
+				A26295D12AFAD37D00DFBAE1 /* Array+Extensions.swift in Sources */,
 				5A237BB12AF661A5006C64DB /* ProductViewController.swift in Sources */,
 				5A237BC22AF68197006C64DB /* ProductViewController+SwiftUI.swift in Sources */,
 				5A237BB32AF66855006C64DB /* ViewModelInterface.swift in Sources */,

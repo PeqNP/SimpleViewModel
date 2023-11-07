@@ -10,13 +10,20 @@ import XCTest
 
 // MARK: View Model
 
+struct ProductSearch: Equatable {
+    let term: String
+    let products: [Int]
+}
+
 struct FooViewModel: ViewModel {
     enum Input {
         case didTapButton
+        case didSearch(String)
     }
 
     enum Output: Equatable {
         case state(State)
+        case products(ProductSearch)
         case showError(String)
     }
 
@@ -29,6 +36,10 @@ struct FooViewModel: ViewModel {
     
     func filter() -> [Input] {
         [.didTapButton]
+    }
+    
+    func debounce() -> [(Input, TimeInterval)] {
+        [(.didSearch(""), 0.3)]
     }
     
     func first(respond: (Output) -> Void) {
@@ -45,6 +56,8 @@ struct FooViewModel: ViewModel {
                 .catch { error in
                     respond(.showError(error.localizedDescription))
                 }
+        case let .didSearch(term):
+            respond(.products(.init(term: term, products: [1, 2, 3])))
         }
     }
 }
@@ -76,7 +89,7 @@ final class SimpleViewModelTests: SimpleTestCase {
 
     override func tearDownWithError() throws { }
 
-    func testViewModel() throws {
+    func testViewModel_filter() throws {
         var calledTimes = 0
         let product = container.force(ProductService.self)
         let pending = Promise<Product>.pending()
@@ -105,6 +118,24 @@ final class SimpleViewModelTests: SimpleTestCase {
         
         // it: should allow the button to be tapped again
         XCTAssertEqual(calledTimes, 2)
+    }
+    
+    func testViewModel_debounce() throws {
+        var outputs = [FooViewModel.Output]()
+        let vm = ViewModelInterface(viewModel: FooViewModel(), receive: { output in
+            outputs.append(output)
+        })
+        
+        // describe: searching for `Chanel`
+        vm.send(.didSearch("C"))
+        vm.send(.didSearch("Ch"))
+        vm.send(.didSearch("Cha"))
+        vm.send(.didSearch("Chan"))
+
+        // it: should debounce search requests
+        // First: is the initial output, Second is the Output from `didSearch`
+        XCTAssertEqual(outputs.count, 2)
+        XCTAssertEqual(FooViewModel.Output.products(.init(term: "Chan", products: [1, 2, 3])), outputs[safe: 1])
     }
     
     func testFooViewModel() throws {

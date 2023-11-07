@@ -7,17 +7,18 @@ class ViewModelInterface<T: ViewModel> {
     let viewModel: T
 
     private let callback: (T.Output) -> Void
-    private var filteredInputs: [String: Bool /* true when `Input` is "active" */]
+    private var filteredInputs = [String: Bool /* true when `Input` is "active" */]()
+    private var debouncedInputs = [String: Debouncer]()
 
     init(viewModel: T, receive: @escaping (T.Output) -> Void) {
         self.viewModel = viewModel
         self.callback = receive
         
-        let filteredInputs = viewModel.filter().map {
-            inputName(for: $0)
+        for input in viewModel.filter() {
+            self.filteredInputs[inputName(for: input)] = false
         }
-        self.filteredInputs = filteredInputs.reduce(into: [String: Bool]()) {
-            $0[$1] = false
+        for input in viewModel.debounce() {
+            self.debouncedInputs[inputName(for: input.0)] = Debouncer(interval: input.1)
         }
         
         viewModel.first(respond: respond)
@@ -26,6 +27,16 @@ class ViewModelInterface<T: ViewModel> {
     func send(_ input: T.Input) {
         let name = inputName(for: input)
         var isFiltered = false
+        
+        func _send(_ input: T.Input) {
+            viewModel.accept(input, respond: { [weak self] (output: T.Output) -> Void in
+                if isFiltered {
+                    self?.filteredInputs[name] = false
+                }
+                self?.respond(output)
+            })
+        }
+        
         if filteredInputs.keys.contains(name) {
             guard !(filteredInputs[name] ?? false) else {
                 return
@@ -33,12 +44,14 @@ class ViewModelInterface<T: ViewModel> {
             isFiltered = true
             filteredInputs[name] = true
         }
-        viewModel.accept(input, respond: { [weak self] (output: T.Output) -> Void in
-            if isFiltered {
-                self?.filteredInputs[name] = false
+        if debouncedInputs.keys.contains(name) {
+            let debouncer = debouncedInputs[name]
+            debouncer?.debounce {
+                _send(input)
             }
-            self?.respond(output)
-        })
+            return
+        }
+        _send(input)
     }
 
     private func respond(_ output: T.Output) {

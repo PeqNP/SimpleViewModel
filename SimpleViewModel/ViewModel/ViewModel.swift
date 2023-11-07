@@ -16,6 +16,9 @@ protocol ViewModel<Input, Output> {
     ///
     /// Use Case: If a user sends an `addToBag` `Input`, and the "Add to bag" operation requires a network call, you can filter all subsequent `addToBag` `Input`s until the "Add to bag" operation succeeds.
     func filter() -> [Input]
+    
+    /// Debounce `Input` signals for N seconds
+    func debounce() -> [(Input, TimeInterval)]
 }
 
 extension ViewModel {
@@ -24,4 +27,6 @@ extension ViewModel {
     
     /// Not every `ViewModel` wants to filter `Input`s
     func filter() -> [Input] { [] }
+    
+    func debounce() -> [(Input, TimeInterval)] { [] }
 }

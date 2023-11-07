@@ -7,7 +7,7 @@ import PromiseKit
 ///
 /// This provides a contrived example to use different versions of a product service
 class ProductService {
-    var product: (ProductID) -> Promise<Product> = { _ in fatalError("Stub Network.Provider.loadProduct") }
+    var product: (ProductID) -> Promise<Product> = { _ in fatalError("Stub Provider.product") }
     
     init() { }
     
