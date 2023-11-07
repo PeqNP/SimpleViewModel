@@ -89,6 +89,17 @@ final class SimpleViewModelTests: SimpleTestCase {
 
     override func tearDownWithError() throws { }
 
+    func testViewModel_first() throws {
+        var outputs = [FooViewModel.Output]()
+        _ = ViewModelInterface(viewModel: FooViewModel(), receive: { output in
+            outputs.append(output)
+        })
+
+        let expected: [FooViewModel.Output] = [
+            .state(.init(id: "5", name: "Foo"))
+        ]
+        XCTAssertEqual(expected, outputs)
+    }
     func testViewModel_filter() throws {
         var calledTimes = 0
         let product = container.force(ProductService.self)
@@ -132,6 +143,9 @@ final class SimpleViewModelTests: SimpleTestCase {
         vm.send(.didSearch("Cha"))
         vm.send(.didSearch("Chan"))
 
+        // Wait 500ms before continuing
+        TestWaiter().wait(for: 0.5)
+        
         // it: should debounce search requests
         // First: is the initial output, Second is the Output from `didSearch`
         XCTAssertEqual(outputs.count, 2)

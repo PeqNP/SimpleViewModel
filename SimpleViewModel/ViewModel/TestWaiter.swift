@@ -11,6 +11,14 @@ class TestWaiter {
         self.description = description
     }
     
+    /// Wait N seconds before continuing the test
+    func wait(for seconds: TimeInterval, file: StaticString = #file, line: UInt = #line) {
+        let waiter = XCTWaiter()
+        let expectation = XCTestExpectation(description: description)
+        waiter.wait(for: [expectation], timeout: seconds)
+    }
+    
+    /// Wait N seconds for a condition to be true before failing test
     func wait(seconds: TimeInterval = 1, file: StaticString = #file, line: UInt = #line, for finished: @escaping () -> Bool) {
         self.finished = finished
         let waiter = XCTWaiter()
