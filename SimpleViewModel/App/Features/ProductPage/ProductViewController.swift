@@ -71,8 +71,8 @@ extension ProductViewController {
                 view.delegate = self
                 skusStackView.addArrangedSubview(view)
             }
-        case .addedToBag:
-            toastLabel.text = "Successfully added product!"
+        case let .showMessage(message):
+            toastLabel.text = message
             toastView.isHidden = false
         }
     }

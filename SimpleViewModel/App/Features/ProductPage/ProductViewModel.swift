@@ -28,7 +28,7 @@ class ProductViewModel: ViewModel {
     enum Output: Equatable {
         case viewState(ViewState)
         case skus([SKU])
-        case addedToBag
+        case showMessage(String)
         case showError(AppError)
     }
     
@@ -75,7 +75,7 @@ class ProductViewModel: ViewModel {
         case let .sku(output):
             switch output {
             case .addedToBag:
-                respond(.addedToBag)
+                respond(.showMessage("Successfully added product!"))
                 break
             case .viewState:
                 break
