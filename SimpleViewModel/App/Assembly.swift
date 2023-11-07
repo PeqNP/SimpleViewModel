@@ -23,11 +23,20 @@ class Assembly {
         container.register(URLSession.self) { _ in
             URLSession(configuration: URLSessionConfiguration.default)
         }
-                
-        // MARK: - Providers
         
-        container.register(ProductService.self) { _ in
-            ProductService()
-        }
+        container.register(FeatureFlags.self) { _ in
+            FeatureFlags()
+        }.inObjectScope(.container)
+                
+        // MARK: - Network
+        
+        container.register(ProductService.self) { resolver in
+            let ff = resolver.force(FeatureFlags.self)
+            return ProductService(useVersion2API: ff.useVersion2ProductService)
+        }.inObjectScope(.container)
+        
+        container.register(CheckoutService.self) { resolver in
+            CheckoutService()
+        }.inObjectScope(.container)
     }
 }

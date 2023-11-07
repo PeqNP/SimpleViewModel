@@ -47,14 +47,14 @@ class ProductViewModel: ViewModel {
         }
     }
 
-    @Dependency var productProvider: ProductProvider!
+    @Dependency var productService: ProductService!
     
     var state: State = .empty
 
     func accept(_ input: Input, respond: @escaping (Output) -> Void) {
         switch input {
         case let .loadProduct(id):
-            productProvider.product(for: id)
+            productService.product(for: id)
                 .done { [weak self] product in
                     guard let state = self?.state else { return }
                     state.product = product

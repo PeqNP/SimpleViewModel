@@ -1,18 +1,40 @@
-//
-//  ProductService.swift
-//  SimpleViewModel
-//
-//  Created by Eric Chamberlain on 11/4/23.
-//
+/// Copyright ⓒ 2023 Bithead LLC. All rights reserved.
 
 import Foundation
 import PromiseKit
 
-class ProductService: ProductProvider {
-    func product(for productId: ProductID) -> Promise<Product> {
-        firstly {
-            requestProduct(for: productId)
+/// Provides products
+///
+/// This provides a contrived example to use different versions of a product service
+class ProductService {
+    var product: (ProductID) -> Promise<Product> = { _ in fatalError("Stub Network.Provider.loadProduct") }
+    
+    init() { }
+    
+    init(useVersion2API: Bool) {
+        if useVersion2API {
+            self.product = _product_v2
         }
+        else {
+            self.product = _product
+        }
+    }
+    
+    func product(for id: ProductID) -> Promise<Product> {
+        product(id)
+    }
+}
+
+private func _product(for id: ProductID) -> Promise<Product> {
+    firstly {
+        requestProduct(for: id)
+    }
+}
+
+private func _product_v2(for id: ProductID) -> Promise<Product> {
+    // This would make a request to a different endpoint. For simplicity, this returns the same thing as the V1 endpoint.
+    firstly {
+        requestProduct(for: id)
     }
 }
 
