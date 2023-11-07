@@ -36,11 +36,6 @@ class ProductViewController: UIViewController {
 
         interface.send(.loadProduct(id: productID))
     }
-    
-    private func showAddedToBag() {
-        toastLabel.text = "Successfully added product!"
-        toastView.isHidden = false
-    }
 
     @objc
     private func didTapToast(_ sender: Any) {
@@ -77,7 +72,8 @@ extension ProductViewController {
                 skusStackView.addArrangedSubview(view)
             }
         case .addedToBag:
-            showAddedToBag()
+            toastLabel.text = "Successfully added product!"
+            toastView.isHidden = false
         }
     }
 }

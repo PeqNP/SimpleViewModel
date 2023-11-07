@@ -26,7 +26,7 @@ class Assembly {
                 
         // MARK: - Providers
         
-        container.register(ProductProvider.self) { _ in
+        container.register(ProductService.self) { _ in
             ProductService()
         }
     }

@@ -25,8 +25,18 @@ class TestViewModelInterface<T: ViewModel> {
         viewModel.accept(input, respond: respond)
         return self
     }
+    
+    func expect(_ expected: [T.Output], wait: DispatchTime = .now() + .milliseconds(1), file: StaticString = #file, line: UInt = #line) {
+        DispatchQueue.main.asyncAfter(deadline: wait) { [weak self] in
+            self?.expect(expected, file: file, line: line)
+        }
+    }
 
-    func expect(_ expected: [T.Output], file: StaticString = #file, line: UInt = #line) {
+    func _expect(_ expected: [T.Output], file: StaticString = #file, line: UInt = #line) {
+        guard !outputs.isEmpty else {
+            XCTAssert(false, "No outputs were recorded. This may be caused by `respond` not being called or `respond` was called asynchronously.", file: file, line: line)
+            return
+        }
         XCTAssertEqual(outputs, expected, file: file, line: line)
         outputs = []
     }

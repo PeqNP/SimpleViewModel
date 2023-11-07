@@ -4,7 +4,7 @@ import Swinject
 
 private var container: Container!
 
-func setContainer(_ c: Container) {
+func setContainer(_ c: Container?) {
     container = c
 }
 
