@@ -51,6 +51,10 @@ class ProductViewModel: ViewModel {
     
     var state: State = .empty
 
+    func filter() -> [Input] {
+        [.loadProduct(id: ""), .didTapLike]
+    }
+    
     func accept(_ input: Input, respond: @escaping (Output) -> Void) {
         switch input {
         case let .loadProduct(id):

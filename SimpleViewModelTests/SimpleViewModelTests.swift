@@ -27,6 +27,10 @@ struct FooViewModel: ViewModel {
 
     @Dependency var product: ProductService!
     
+    func filter() -> [Input] {
+        [.didTapButton]
+    }
+    
     func first(respond: (Output) -> Void) {
         respond(.state(.init(id: "5", name: "Foo")))
     }
@@ -73,6 +77,37 @@ final class SimpleViewModelTests: SimpleTestCase {
     override func tearDownWithError() throws { }
 
     func testViewModel() throws {
+        var calledTimes = 0
+        let product = container.force(ProductService.self)
+        let pending = Promise<Product>.pending()
+        
+        product.product = { id in
+            calledTimes += 1
+            return pending.promise
+        }
+
+        var outputs = [FooViewModel.Output]()
+        let vm = ViewModelInterface(viewModel: FooViewModel(), receive: { output in
+            outputs.append(output)
+        })
+        
+        // describe: filter button taps
+        vm.send(.didTapButton)
+        vm.send(.didTapButton)
+        
+        // it: should filter the `Input`
+        XCTAssertEqual(calledTimes, 1)
+        
+        // describe: finish the `Input`'s operation
+        pending.resolver.fulfill(.init(id: "1", name: "Name", price: .single(.regular(10)), skus: []))
+        TestWaiter().wait(for: { !outputs.isEmpty })
+        vm.send(.didTapButton)
+        
+        // it: should allow the button to be tapped again
+        XCTAssertEqual(calledTimes, 2)
+    }
+    
+    func testFooViewModel() throws {
         let tester = TestViewModelInterface(viewModel: FooViewModel())
 
         tester.expect([
