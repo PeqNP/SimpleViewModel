@@ -2,7 +2,7 @@
 
 import Foundation
 
-protocol ViewModel<Input, Output> {
+public protocol ViewModel<Input, Output> {
     associatedtype Input
     associatedtype Output: Equatable
 
@@ -21,7 +21,7 @@ protocol ViewModel<Input, Output> {
     func debounce() -> [(Input, TimeInterval)]
 }
 
-extension ViewModel {
+public extension ViewModel {
     /// Not every view model wishes to respond before signals can be sent
     func first(respond: (Output) -> Void) { }
     

@@ -8,18 +8,18 @@ import XCTest
 /// Provides API for view to interact with its respective `ViewModel`
 ///
 /// The tester does NOT provide facilities to filter or debounce signals.
-class TestViewModelInterface<T: ViewModel> {
-    let viewModel: T
+public class TestViewModelInterface<T: ViewModel> {
+    private let viewModel: T
 
-    var outputs: [T.Output] = []
+    private var outputs: [T.Output] = []
 
-    init(viewModel: T) {
+    public init(viewModel: T) {
         self.viewModel = viewModel
 
         viewModel.first(respond: respond)
     }
 
-    func send(_ input: T.Input, file: StaticString = #file, line: UInt = #line) -> Self {
+    public func send(_ input: T.Input, file: StaticString = #file, line: UInt = #line) -> Self {
         guard outputs.isEmpty else {
             XCTAssert(false, "Untested outputs encountered from previous `send`", file: file, line: line)
             return self
@@ -31,7 +31,7 @@ class TestViewModelInterface<T: ViewModel> {
     /// Expect `[Output]` from a given `send` action.
     ///
     /// If multiple `Output`s are expected, they _must_ be performed at the same time within the same thread.
-    func expect(_ expected: [T.Output], wait seconds: TimeInterval = 2, file: StaticString = #file, line: UInt = #line) {
+    public func expect(_ expected: [T.Output], wait seconds: TimeInterval = 2, file: StaticString = #file, line: UInt = #line) {
         let waiter = TestWaiter(description: "Outputs are equal")
         waiter.wait(seconds: seconds, file: file, line: line) { [weak self] in
             !(self?.outputs.isEmpty ?? false)

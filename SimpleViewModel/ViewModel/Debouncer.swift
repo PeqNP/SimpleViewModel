@@ -6,7 +6,7 @@ public class Debouncer {
     private let interval: TimeInterval
     private var timer: Timer?
     
-    init(interval: TimeInterval) {
+    public init(interval: TimeInterval) {
         self.interval = interval
     }
     

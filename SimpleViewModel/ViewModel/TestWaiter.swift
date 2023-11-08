@@ -3,23 +3,23 @@
 import Foundation
 import XCTest
 
-class TestWaiter {
+public class TestWaiter {
     private let description: String
     private var finished: () -> Bool = { true }
     
-    init(description: String = "") {
+    public init(description: String = "") {
         self.description = description
     }
     
     /// Wait N seconds before continuing the test
-    func wait(for seconds: TimeInterval, file: StaticString = #file, line: UInt = #line) {
+    public func wait(for seconds: TimeInterval, file: StaticString = #file, line: UInt = #line) {
         let waiter = XCTWaiter()
         let expectation = XCTestExpectation(description: description)
         waiter.wait(for: [expectation], timeout: seconds)
     }
     
     /// Wait N seconds for a condition to be true before failing test
-    func wait(seconds: TimeInterval = 1, file: StaticString = #file, line: UInt = #line, for finished: @escaping () -> Bool) {
+    public func wait(seconds: TimeInterval = 1, file: StaticString = #file, line: UInt = #line, for finished: @escaping () -> Bool) {
         self.finished = finished
         let waiter = XCTWaiter()
         let expectation = XCTestExpectation(description: description)

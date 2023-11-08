@@ -3,14 +3,14 @@
 import Foundation
 
 /// Provides API for view to interact with its respective `ViewModel`
-class ViewModelInterface<T: ViewModel> {
-    let viewModel: T
+public class ViewModelInterface<T: ViewModel> {
+    private let viewModel: T
 
     private let callback: (T.Output) -> Void
     private var filteredInputs = [String: Bool /* true when `Input` is "active" */]()
     private var debouncedInputs = [String: Debouncer]()
 
-    init(viewModel: T, receive: @escaping (T.Output) -> Void) {
+    public init(viewModel: T, receive: @escaping (T.Output) -> Void) {
         self.viewModel = viewModel
         self.callback = receive
         
@@ -24,7 +24,7 @@ class ViewModelInterface<T: ViewModel> {
         viewModel.first(respond: respond)
     }
 
-    func send(_ input: T.Input) {
+    public func send(_ input: T.Input) {
         let name = inputName(for: input)
         var isFiltered = false
         
