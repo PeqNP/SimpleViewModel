@@ -60,11 +60,13 @@ Pod::Spec.new do |spec|
   #  the deployment target. You can optionally include the target after the platform.
   #
 
+  spec.swift_versions = "5.0"
+
   #  When using multiple platforms
   spec.ios.deployment_target = "15.0"
   spec.osx.deployment_target = "14.0"
-  spec.watchos.deployment_target = "10.0"
-  spec.tvos.deployment_target = "17.0"
+  # spec.watchos.deployment_target = "10.0"
+  # spec.tvos.deployment_target = "17.0"
 
 
   # ――― Source Location ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -85,8 +87,12 @@ Pod::Spec.new do |spec|
   #
 
   spec.source_files  = "SimpleViewModel/ViewModel/*.*"
-  # spec.exclude_files = "Classes/Exclude"
+  spec.exclude_files = "SimpleViewModel/ViewModel/Test*.swift"
   # spec.public_header_files = "Classes/**/*.h"
+  spec.test_spec 'Tests' do |test_spec|
+    test_spec.source_files = 'SimpleViewModel/ViewModel/Test*.swift'
+    # test_spec.dependency 'OCMock' # This dependency will only be linked with your tests.
+  end
 
 
   # ――― Resources ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
