@@ -20,4 +20,6 @@ Pod::Spec.new do |spec|
   spec.source_files = "SimpleViewModel/ViewModel/Test*.swift"
 
   spec.framework = 'XCTest'
+
+  spec.dependency 'SimpleViewModel', '1.0.1'
 end
