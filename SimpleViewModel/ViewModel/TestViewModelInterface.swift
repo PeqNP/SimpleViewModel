@@ -3,7 +3,7 @@
 import Foundation
 import XCTest
 
-@testable import SimpleViewModel
+import SimpleViewModel
 
 /// Provides API for view to interact with its respective `ViewModel`
 ///
