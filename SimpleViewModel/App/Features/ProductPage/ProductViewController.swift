@@ -23,7 +23,9 @@ class ProductViewController: UIViewController {
     @IBOutlet weak var likeButton: UIButton!
     
     // If no configuration is required by view model, instantiate here. It may be necessary to instantiate this in `configure` or even `viewDidLoad`. It's up to you.
-    private lazy var interface: ViewModelInterface<ProductViewModel> = .init(viewModel: .init(), receive: receive)
+    private lazy var interface: ViewModelInterface<ProductViewModel> = .init(viewModel: .init()) { [weak self] in
+        self?.receive(output: $0)
+    }
 
     private var productID: ProductID!
 
