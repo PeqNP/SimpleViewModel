@@ -21,6 +21,9 @@ public class ViewModelInterface<T: ViewModel> {
             self.debouncedInputs[inputName(for: input.0)] = Debouncer(interval: input.1)
         }
         
+        viewModel.responder { [weak self] (output: T.Output) -> Void in
+            self?.respond(output)
+        }
         viewModel.first(respond: respond)
     }
 
@@ -65,7 +68,6 @@ public class ViewModelInterface<T: ViewModel> {
             }
         }
     }
-    
 }
 
 private func inputName(for input: Any) -> String {
