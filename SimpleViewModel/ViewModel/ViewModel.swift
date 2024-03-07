@@ -6,13 +6,13 @@ public protocol ViewModel<Input, Output> {
     associatedtype Input
     associatedtype Output: Equatable
 
-    typealias ResponderCallback = (Output) -> Void
+    typealias RespondCallback = (Output) -> Void
 
     /// Allows the `ViewModel` to send a signal before any events may be accepted. This can be used to populate the default state of the view.
-    func first(respond: (Output) -> Void)
+    func first(respond: RespondCallback)
     
     /// Accept an input from the consumer and respond in kind.
-    func accept(_ input: Input, respond: @escaping (Output) -> Void)
+    func accept(_ input: Input, respond: @escaping RespondCallback)
 
     /// Filter `Input` signals from being sent to the `ViewModel` until the respective `Input` operation has finished.
     ///
@@ -31,17 +31,17 @@ public protocol ViewModel<Input, Output> {
      - This is considered a configuration step, and, therefore, is called before `first`
      - Messages sent on this channel are not filtered or debounced
      */
-    func responder(respond: @escaping ResponderCallback)
+    func responder(respond: @escaping RespondCallback)
 }
 
 public extension ViewModel {
     /// Not every view model wishes to respond before signals can be sent
-    func first(respond: (Output) -> Void) { }
-    
+    func first(respond: RespondCallback) { }
+
     /// Not every `ViewModel` wants to filter `Input`s
     func filter() -> [Input] { [] }
     
     func debounce() -> [(Input, TimeInterval)] { [] }
 
-    func responder(respond: @escaping (Output) -> Void) { }
+    func responder(respond: @escaping RespondCallback) { }
 }
