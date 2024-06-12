@@ -51,18 +51,18 @@ class ProductViewModel: ViewModel {
     
     var state: State = .empty
 
-    var async: RespondCallback?
+    var async: AsyncRespondCallback?
 
     func filter() -> [Input] {
         [.loadProduct(id: ""), .didTapLike]
     }
 
-    func responder(respond: @escaping RespondCallback) {
+    func responder(respond: @escaping AsyncRespondCallback) {
         // This callback is designed for cases where a direct input is not correlated with an output. For example, if this view model is listening to the user's sign in status, it may need to tell the consumer to update its UI to reflect the user's sign in state.
         self.async = respond
     }
 
-    func accept(_ input: Input, respond: @escaping RespondCallback) {
+    func accept(_ input: Input, respond: @escaping AsyncRespondCallback) {
         switch input {
         case let .loadProduct(id):
             productService.product(for: id)
