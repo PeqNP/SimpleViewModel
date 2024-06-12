@@ -15,9 +15,11 @@ struct ProductSearch: Equatable {
     let products: [Int]
 }
 
+/// This is designed to test filtering specific inputs and the debounce logic
 struct FooViewModel: ViewModel {
     enum Input {
         case didTapButton
+        case didTapOtherButton
         case didSearch(String)
     }
 
@@ -37,9 +39,13 @@ struct FooViewModel: ViewModel {
     func filter() -> [Input] {
         [.didTapButton]
     }
-    
-    func debounce() -> [(Input, TimeInterval)] {
-        [(.didSearch(""), 0.3)]
+
+    func filterAllInputs() -> [Input] {
+        [.didTapOtherButton]
+    }
+
+    func debounce() -> [Debounce<Input>] {
+        [.init(input: .didSearch(""), interval: 0.3)]
     }
     
     func first(respond: (Output) -> Void) {
@@ -48,7 +54,54 @@ struct FooViewModel: ViewModel {
 
     func accept(_ input: Input, respond: @escaping (Output) -> Void) {
         switch input {
-        case .didTapButton:
+        case .didTapButton,
+             .didTapOtherButton:
+            product.product(for: "10")
+                .done { product in
+                    respond(.state(.init(id: product.id, name: product.name)))
+                }
+                .catch { error in
+                    respond(.showError(error.localizedDescription))
+                }
+        case let .didSearch(term):
+            respond(.products(.init(term: term, products: [1, 2, 3])))
+        }
+    }
+}
+
+///  This is designed to test filtering all `Input`s, regardless of which `Input` is sent
+struct BarViewModel: ViewModel {
+    enum Input {
+        case didTapButton
+        case didTapOtherButton
+        case didSearch(String)
+    }
+
+    enum Output: Equatable {
+        case state(State)
+        case products(ProductSearch)
+        case showError(String)
+    }
+
+    struct State: Equatable {
+        let id: String
+        let name: String
+    }
+
+    @Dependency var product: ProductService!
+
+    func filterAll() -> Bool {
+        true
+    }
+
+    func first(respond: (Output) -> Void) {
+        respond(.state(.init(id: "5", name: "Foo")))
+    }
+
+    func accept(_ input: Input, respond: @escaping (Output) -> Void) {
+        switch input {
+        case .didTapButton,
+             .didTapOtherButton:
             product.product(for: "10")
                 .done { product in
                     respond(.state(.init(id: product.id, name: product.name)))
@@ -100,6 +153,7 @@ final class SimpleViewModelTests: SimpleTestCase {
         ]
         XCTAssertEqual(expected, outputs)
     }
+
     func testViewModel_filter() throws {
         var calledTimes = 0
         let product = container.force(ProductService.self)
@@ -130,7 +184,78 @@ final class SimpleViewModelTests: SimpleTestCase {
         // it: should allow the button to be tapped again
         XCTAssertEqual(calledTimes, 2)
     }
-    
+
+    func testViewModel_filterAllInputs() throws {
+        var calledTimes = 0
+        let product = container.force(ProductService.self)
+        let pending = Promise<Product>.pending()
+
+        product.product = { id in
+            calledTimes += 1
+            return pending.promise
+        }
+
+        var outputs = [FooViewModel.Output]()
+        let vm = ViewModelInterface(viewModel: FooViewModel(), receive: { output in
+            outputs.append(output)
+        })
+
+        // describe: filter all signals
+        vm.send(.didTapOtherButton)
+        vm.send(.didTapButton)
+        vm.send(.didSearch("term"))
+        vm.send(.didTapButton)
+
+        // it: should only call service once
+        XCTAssertEqual(calledTimes, 1)
+        // it: should filter all `Input`s
+        XCTAssertEqual(outputs.count, 1)
+
+        // describe: finish the `Input`'s operation
+        pending.resolver.fulfill(.init(id: "1", name: "Name", price: .single(.regular(10)), skus: []))
+        TestWaiter().wait(for: { outputs.count == 2 })
+        vm.send(.didTapOtherButton)
+
+        // it: should allow the button to be tapped again
+        XCTAssertEqual(calledTimes, 2)
+    }
+
+    func testViewModel_filterAll() throws {
+        var calledTimes = 0
+        let product = container.force(ProductService.self)
+        let pending = Promise<Product>.pending()
+
+        product.product = { id in
+            calledTimes += 1
+            return pending.promise
+        }
+
+        var outputs = [BarViewModel.Output]()
+        let vm = ViewModelInterface(viewModel: BarViewModel(), receive: { output in
+            outputs.append(output)
+        })
+
+        // describe: filter all signals
+        vm.send(.didTapOtherButton)
+        vm.send(.didTapButton)
+        vm.send(.didSearch("term"))
+        vm.send(.didTapButton)
+
+        // it: should only call service once
+        XCTAssertEqual(calledTimes, 1)
+        // it: should filter all `Input`s
+        XCTAssertEqual(outputs.count, 1)
+
+        // describe: finish the `Input`'s operation
+        pending.resolver.fulfill(.init(id: "1", name: "Name", price: .single(.regular(10)), skus: []))
+        TestWaiter().wait(for: { outputs.count == 2 })
+        vm.send(.didTapOtherButton)
+
+        // it: should allow the button to be tapped again
+        XCTAssertEqual(calledTimes, 2)
+        XCTAssertEqual(outputs.count, 2)
+    }
+
     func testViewModel_debounce() throws {
         var outputs = [FooViewModel.Output]()
         let vm = ViewModelInterface(viewModel: FooViewModel(), receive: { output in
