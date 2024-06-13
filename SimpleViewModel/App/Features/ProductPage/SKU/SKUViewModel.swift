@@ -2,7 +2,7 @@
 
 import Foundation
 
-struct SKUViewModel: ViewModel {    
+struct SKUViewModel: ViewModel {
     struct ViewState: Equatable {
         let color: String
         let price: String

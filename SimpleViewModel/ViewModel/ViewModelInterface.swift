@@ -37,19 +37,18 @@ public class ViewModelInterface<T: ViewModel> {
         var isFiltered = false
         
         func _send(_ input: T.Input) {
-            viewModel.accept(input, respond: { [weak self] (output: T.Output) -> Void in
-                self?.isFilteringAllTests = false
-
-                if isFiltered {
-                    if self?.filterAllInputs.keys.contains(name) ?? false {
-                        self?.filterAllInputs[name] = false
-                    }
-                    if self?.filteredInputs.keys.contains(name) ?? false {
-                        self?.filteredInputs[name] = false
-                    }
-                }
-                self?.respond(output)
-            })
+            do {
+                try viewModel.accept(input, respond: { [weak self] (output: T.Output) -> Void in
+                    self?.clearFilterStates(for: name, isFiltered: isFiltered)
+                    self?.respond(output)
+                })
+            }
+            catch {
+                viewModel.thrownError(error, respond: { [weak self] (output: T.Output) in
+                    self?.clearFilterStates(for: name, isFiltered: isFiltered)
+                    self?.respond(output)
+                })
+            }
         }
 
         // Filter all `Input`s if there is any other `Input` in-flight
@@ -90,6 +89,19 @@ public class ViewModelInterface<T: ViewModel> {
         }
 
         _send(input)
+    }
+
+    private func clearFilterStates(for name: String, isFiltered: Bool) {
+        isFilteringAllTests = false
+
+        if isFiltered {
+            if filterAllInputs.keys.contains(name) {
+                filterAllInputs[name] = false
+            }
+            if filteredInputs.keys.contains(name) {
+                filteredInputs[name] = false
+            }
+        }
     }
 
     private func respond(_ output: T.Output) {

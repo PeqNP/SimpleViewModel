@@ -62,7 +62,7 @@ class ProductViewModel: ViewModel {
         self.async = respond
     }
 
-    func accept(_ input: Input, respond: @escaping AsyncRespondCallback) {
+    func accept(_ input: Input, respond: @escaping RespondCallback) {
         switch input {
         case let .loadProduct(id):
             productService.product(for: id)

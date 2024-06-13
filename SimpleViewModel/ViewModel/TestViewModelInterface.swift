@@ -16,7 +16,9 @@ public class TestViewModelInterface<T: ViewModel> {
     public init(viewModel: T) {
         self.viewModel = viewModel
 
-        viewModel.first(respond: respond)
+        viewModel.first { [weak self] output in
+            self?.respond(output)
+        }
     }
 
     public func send(_ input: T.Input, file: StaticString = #file, line: UInt = #line) -> Self {
@@ -24,7 +26,16 @@ public class TestViewModelInterface<T: ViewModel> {
             XCTAssert(false, "Untested outputs encountered from previous `send`", file: file, line: line)
             return self
         }
-        viewModel.accept(input, respond: respond)
+        do {
+            try viewModel.accept(input) { [weak self] output in
+                self?.respond(output)
+            }
+        }
+        catch {
+            viewModel.thrownError(error) { [weak self] output in
+                self?.respond(output)
+            }
+        }
         return self
     }
     

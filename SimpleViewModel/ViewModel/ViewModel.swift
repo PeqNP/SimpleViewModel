@@ -17,10 +17,11 @@ public protocol ViewModel<Input, Output> {
     typealias AsyncRespondCallback = (Output) -> Void
 
     /// Allows the `ViewModel` to send a signal before any events may be accepted. This can be used to populate the default state of the view.
-    func first(respond: AsyncRespondCallback)
+    func first(respond: RespondCallback)
     
     /// Accept an input from the consumer and respond in kind.
-    func accept(_ input: Input, respond: @escaping AsyncRespondCallback)
+    /// - Throws: When an `Input` throws, `thrownError(_:)` is called with the respective `Error`
+    func accept(_ input: Input, respond: @escaping RespondCallback) throws
 
     /// Filter `Input` signals from being sent to the `ViewModel` until the respective `Input` operation has finished.
     ///
@@ -48,6 +49,11 @@ public protocol ViewModel<Input, Output> {
      - Messages sent on this channel are not filtered or debounced
      */
     func responder(respond: @escaping AsyncRespondCallback)
+
+    /// Called when an operation bubbles up an `Error` from `accept(_:respond:)`.
+    ///
+    /// Use Case: This provides a way for vm to display an error if an `Input` operation failed. Please catch `Error`s where necessary. However, in many contexts, all you wish to do is bubble up the `Error` from some other operation. If you use the `Simple`
+    func thrownError(_ error: Error, respond: @escaping RespondCallback)
 }
 
 /// Default implementations for optional behaviors
@@ -58,4 +64,5 @@ public extension ViewModel {
     func filterAllInputs() -> [Input] { [Input]() }
     func debounce() -> [Debounce<Input>] { [Debounce<Input>]() }
     func responder(respond: @escaping AsyncRespondCallback) { }
+    func thrownError(_ error: Error, respond: @escaping RespondCallback) { }
 }

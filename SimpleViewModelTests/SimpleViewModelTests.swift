@@ -69,12 +69,17 @@ struct FooViewModel: ViewModel {
     }
 }
 
+enum FakeError: Error, Equatable {
+    case testError
+}
+
 ///  This is designed to test filtering all `Input`s, regardless of which `Input` is sent
 struct BarViewModel: ViewModel {
     enum Input {
         case didTapButton
         case didTapOtherButton
         case didSearch(String)
+        case didTapEditButton
     }
 
     enum Output: Equatable {
@@ -98,7 +103,11 @@ struct BarViewModel: ViewModel {
         respond(.state(.init(id: "5", name: "Foo")))
     }
 
-    func accept(_ input: Input, respond: @escaping (Output) -> Void) {
+    func thrownError(_ error: any Error, respond: RespondCallback) {
+        respond(.showError(String(describing: error)))
+    }
+
+    func accept(_ input: Input, respond: @escaping (Output) -> Void) throws {
         switch input {
         case .didTapButton,
              .didTapOtherButton:
@@ -111,6 +120,8 @@ struct BarViewModel: ViewModel {
                 }
         case let .didSearch(term):
             respond(.products(.init(term: term, products: [1, 2, 3])))
+        case .didTapEditButton:
+            throw FakeError.testError
         }
     }
 }
@@ -254,6 +265,17 @@ final class SimpleViewModelTests: SimpleTestCase {
         // it: should allow the button to be tapped again
         XCTAssertEqual(calledTimes, 2)
         XCTAssertEqual(outputs.count, 2)
+    }
+
+    func testViewModel_thrownError() throws {
+        var outputs = [BarViewModel.Output]()
+        let vm = ViewModelInterface(viewModel: BarViewModel(), receive: { output in
+            outputs.append(output)
+        })
+
+        vm.send(.didTapEditButton)
+        XCTAssertEqual(outputs.count, 2)
+        XCTAssertEqual(outputs[safe: 1], BarViewModel.Output.showError(String(describing: FakeError.testError)))
     }
 
     func testViewModel_debounce() throws {
