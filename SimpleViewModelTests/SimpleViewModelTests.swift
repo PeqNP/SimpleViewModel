@@ -168,8 +168,8 @@ final class SimpleViewModelTests: SimpleTestCase {
     func testViewModel_filter() throws {
         var calledTimes = 0
         let product = container.force(ProductService.self)
-        let pending = Promise<Product>.pending()
-        
+        let pending = PromiseKit.Promise<Product>.pending()
+
         product.product = { id in
             calledTimes += 1
             return pending.promise
@@ -199,7 +199,7 @@ final class SimpleViewModelTests: SimpleTestCase {
     func testViewModel_filterAllInputs() throws {
         var calledTimes = 0
         let product = container.force(ProductService.self)
-        let pending = Promise<Product>.pending()
+        let pending = PromiseKit.Promise<Product>.pending()
 
         product.product = { id in
             calledTimes += 1
@@ -234,7 +234,7 @@ final class SimpleViewModelTests: SimpleTestCase {
     func testViewModel_filterAll() throws {
         var calledTimes = 0
         let product = container.force(ProductService.self)
-        let pending = Promise<Product>.pending()
+        let pending = PromiseKit.Promise<Product>.pending()
 
         product.product = { id in
             calledTimes += 1

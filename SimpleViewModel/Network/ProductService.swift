@@ -7,8 +7,8 @@ import PromiseKit
 ///
 /// This provides a contrived example to use different versions of a product service
 class ProductService {
-    var product: (ProductID) -> Promise<Product> = { _ in fatalError("Stub Provider.product") }
-    
+    var product: (ProductID) -> PromiseKit.Promise<Product> = { _ in fatalError("Stub Provider.product") }
+
     init() { }
     
     init(useVersion2API: Bool) {
@@ -20,25 +20,25 @@ class ProductService {
         }
     }
     
-    func product(for id: ProductID) -> Promise<Product> {
+    func product(for id: ProductID) -> PromiseKit.Promise<Product> {
         product(id)
     }
 }
 
-private func _product(for id: ProductID) -> Promise<Product> {
+private func _product(for id: ProductID) -> PromiseKit.Promise<Product> {
     firstly {
         requestProduct(for: id)
     }
 }
 
-private func _product_v2(for id: ProductID) -> Promise<Product> {
+private func _product_v2(for id: ProductID) -> PromiseKit.Promise<Product> {
     // This would make a request to a different endpoint. For simplicity, this returns the same thing as the V1 endpoint.
     firstly {
         requestProduct(for: id)
     }
 }
 
-private func requestProduct(for productId: ProductID) -> Promise<Product> {
+private func requestProduct(for productId: ProductID) -> PromiseKit.Promise<Product> {
     // Fake request for now
     .value(.init(
         id: "1",
