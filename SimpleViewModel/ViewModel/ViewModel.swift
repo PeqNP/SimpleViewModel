@@ -68,7 +68,6 @@ public extension ViewModel {
 }
 
 public class Promise<T> {
-
     public typealias CompleteCallback = (Result<T, Error>) -> Void
     public typealias SuccessCallback = (T) -> Void
     public typealias FailureCallback = (Error) -> Void
@@ -102,14 +101,18 @@ public class Promise<T> {
         resolveFailure()
     }
 
-    public func onSuccess(callback: @escaping SuccessCallback) {
+    @discardableResult
+    public func onSuccess(callback: @escaping SuccessCallback) -> Self {
         successCallbacks.append(callback)
         resolveSuccess()
+        return self
     }
 
-    public func onFailure(callback: @escaping FailureCallback) {
+    @discardableResult
+    public func onFailure(callback: @escaping FailureCallback) -> Self {
         failureCallbacks.append(callback)
         resolveFailure()
+        return self
     }
 
     public func onComplete(callback: @escaping CompleteCallback) {
@@ -146,11 +149,12 @@ public class Promise<T> {
 }
 
 public extension ViewModel {
-    func asyncTask<T>(callback: @escaping () throws -> T) -> Promise<T> {
+    @discardableResult
+    func asyncTask<T>(callback: @escaping () async throws -> T) -> Promise<T> {
         let promise = Promise<T>()
         Task {
             do {
-                let value = try callback()
+                let value = try await callback()
                 promise.success(value)
             }
             catch {

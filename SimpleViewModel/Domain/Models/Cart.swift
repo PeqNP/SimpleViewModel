@@ -2,6 +2,6 @@
 
 import Foundation
 
-struct Cart {
+struct Cart: Equatable {
     let products: [Product]
 }

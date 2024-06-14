@@ -318,4 +318,8 @@ final class SimpleViewModelTests: SimpleTestCase {
         // This isn't necessary. If the value from the `send` function is unused, a compiler warning will show, making it immediately obvious that it is missing an expectation.
         tester.finish()
     }
+
+    func testAsyncRequests() throws {
+        
+    }
 }
