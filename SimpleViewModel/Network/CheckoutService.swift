@@ -4,7 +4,7 @@ import Foundation
 import PromiseKit
 
 class CheckoutService {
-    var cart: () -> PromiseKit.Promise<Cart> = { fatalError("Stub Network.Provider.cart") }
+    var cart: () -> Promise<Cart> = { fatalError("Stub Network.Provider.cart") }
 
     init() { }
     
@@ -13,7 +13,7 @@ class CheckoutService {
     }
 }
 
-private func _cart() -> PromiseKit.Promise<Cart> {
+private func _cart() -> Promise<Cart> {
     .value(.init(
         products: [
             .init(

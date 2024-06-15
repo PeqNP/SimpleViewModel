@@ -10,13 +10,13 @@ import XCTest
 
 // MARK: View Model
 
-struct ProductSearch: Equatable {
+private struct ProductSearch: Equatable {
     let term: String
     let products: [Int]
 }
 
 /// This is designed to test filtering specific inputs and the debounce logic
-struct FooViewModel: ViewModel {
+private struct FooViewModel: ViewModel {
     enum Input {
         case didTapButton
         case didTapOtherButton
@@ -69,12 +69,12 @@ struct FooViewModel: ViewModel {
     }
 }
 
-enum FakeError: Error, Equatable {
+private enum FakeError: Error, Equatable {
     case testError
 }
 
 ///  This is designed to test filtering all `Input`s, regardless of which `Input` is sent
-struct BarViewModel: ViewModel {
+private struct BarViewModel: ViewModel {
     enum Input {
         case didTapButton
         case didTapOtherButton
@@ -168,7 +168,7 @@ final class SimpleViewModelTests: SimpleTestCase {
     func testViewModel_filter() throws {
         var calledTimes = 0
         let product = container.force(ProductService.self)
-        let pending = PromiseKit.Promise<Product>.pending()
+        let pending = Promise<Product>.pending()
 
         product.product = { id in
             calledTimes += 1
@@ -199,7 +199,7 @@ final class SimpleViewModelTests: SimpleTestCase {
     func testViewModel_filterAllInputs() throws {
         var calledTimes = 0
         let product = container.force(ProductService.self)
-        let pending = PromiseKit.Promise<Product>.pending()
+        let pending = Promise<Product>.pending()
 
         product.product = { id in
             calledTimes += 1
@@ -234,7 +234,7 @@ final class SimpleViewModelTests: SimpleTestCase {
     func testViewModel_filterAll() throws {
         var calledTimes = 0
         let product = container.force(ProductService.self)
-        let pending = PromiseKit.Promise<Product>.pending()
+        let pending = Promise<Product>.pending()
 
         product.product = { id in
             calledTimes += 1
