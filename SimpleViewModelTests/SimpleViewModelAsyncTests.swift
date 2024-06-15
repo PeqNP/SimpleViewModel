@@ -9,8 +9,7 @@ private enum AsyncError: Error, Equatable {
     case testError
 }
 
-/// This view model shows how you can inject and use a protocol-oriented approach with this library.
-/// It also shows how you can integrate `async` into your vms using the `asyncTask` extension.
+/// This shows how you can use `async` vms.
 private struct AsyncViewModel: ViewModel {
     enum Input {
         case didTapAddButton
@@ -32,20 +31,15 @@ private struct AsyncViewModel: ViewModel {
         true
     }
 
-    func accept(_ input: Input, respond: @escaping (Output) -> Void) throws {
+    func thrownError(_ error: any Error, respond: @escaping RespondCallback) {
+        respond(.showError(String(describing: error)))
+    }
+
+    func accept(_ input: Input, respond: @escaping (Output) -> Void) async throws {
         switch input {
         case .didTapAddButton:
-            // This is how you can perform N number of `async` calls and respond accordingly. You an also use the Promise library of your choice, using a similar pattern.
-            asyncTask { () -> Cart in
-                try await cart.addProduct(.init(id: "1", name: "Eric", price: .single(.regular(1_000_000)), skus: []))
-                // You can add multiple try...await, `Task`s, etc. in this block.
-            }
-            .onSuccess { cart in
-                respond(.showCart(cart))
-            }
-            .onFailure { error in
-                respond(.showError(String(describing: error)))
-            }
+            let cart = try await cart.addProduct(.init(id: "1", name: "Eric", price: .single(.regular(1_000_000)), skus: []))
+            respond(.showCart(cart))
         }
     }
 }
@@ -72,7 +66,7 @@ private class FakeCartService: CartProvider {
         }
         return cart
     }
-    
+
     func removeProduct(_ product: SimpleViewModel.Product) async throws -> SimpleViewModel.Cart {
         removedProducts.append(product)
         guard let cart else {
@@ -98,153 +92,14 @@ final class SimpleViewModelAsyncTests: SimpleTestCase {
         cart.cart = .init(products: [])
         vm.send(.didTapAddButton)
 
-        TestWaiter().wait(for: { outputs.count == 1 })
         let expected: [AsyncViewModel.Output] = [.showCart(.init(products: []))]
-        XCTAssertEqual(outputs, expected)
+        TestWaiter.wait(for: { outputs == expected })
 
         // describe: load products; raise error
         cart.cart = nil // Setting this to `nil` has the effect of making service raise error
         vm.send(.didTapAddButton)
 
-        TestWaiter().wait(for: { outputs.count == 2 })
+        TestWaiter.wait(for: { outputs.count == 2 })
         XCTAssertEqual(outputs[safe: 1], AsyncViewModel.Output.showError(String(describing: TestError.productNotFound)))
-    }
-
-    func testPromise_fulfillSuccess() throws {
-        var promise = AsyncTask<Product>()
-
-        var fulfilledProduct: Product?
-
-        // describe: fulfill promise before success callback is registered
-        let product = Product(id: "1", name: "Eric", price: .single(.regular(10)), skus: [])
-        promise.success(product)
-        promise.onSuccess { p in
-            fulfilledProduct = p
-        }
-        TestWaiter().wait(for: { promise.fulfilled })
-        XCTAssertEqual(product, fulfilledProduct)
-
-        // describe: fulfill promise after on success callback is registered
-        fulfilledProduct = nil
-        promise = AsyncTask<Product>()
-        promise.onSuccess { p in
-            fulfilledProduct = p
-        }
-        XCTAssertFalse(promise.fulfilled)
-        promise.success(product)
-        TestWaiter().wait(for: { promise.fulfilled })
-        XCTAssertEqual(product, fulfilledProduct)
-    }
-
-    func testPromise_fulfillError() throws {
-        var promise = AsyncTask<Product>()
-
-        var fulfilledError: AsyncError?
-
-        // describe: fulfill promise before error callback is registered
-        promise.failure(AsyncError.testError)
-        promise.onFailure { e in
-            fulfilledError = e as? AsyncError
-        }
-        TestWaiter().wait(for: { promise.fulfilled })
-        XCTAssertEqual(AsyncError.testError, fulfilledError)
-
-        // describe: fulfill promise after error callback is registered
-        fulfilledError = nil
-        promise = AsyncTask<Product>()
-        promise.onFailure { e in
-            fulfilledError = e as? AsyncError
-        }
-        XCTAssertFalse(promise.fulfilled)
-        promise.failure(AsyncError.testError)
-        TestWaiter().wait(for: { promise.fulfilled })
-        XCTAssertEqual(AsyncError.testError, fulfilledError)
-    }
-
-    func testPromise_fulfillComplete_success() throws {
-        var promise = AsyncTask<Product>()
-
-        var fulfilledProduct: Product?
-
-        // describe: fulfill promise before success callback is registered
-        let product = Product(id: "1", name: "Eric", price: .single(.regular(10)), skus: [])
-        promise.success(product)
-        promise.onComplete { result in
-            switch result {
-            case let .success(product):
-                fulfilledProduct = product
-            case .failure:
-                XCTFail("expected onComplete to succeed")
-            }
-        }
-        TestWaiter().wait(for: { promise.fulfilled })
-        XCTAssertEqual(product, fulfilledProduct)
-
-        // describe: register to promise after fulfillment as success callback
-        fulfilledProduct = nil
-        promise.onSuccess { p in
-            fulfilledProduct = p
-        }
-        // it: should immediately resolve promise
-        XCTAssertEqual(product, fulfilledProduct)
-
-        // describe: fulfill promise after on success callback is registered
-        fulfilledProduct = nil
-        promise = AsyncTask<Product>()
-        promise.onComplete { result in
-            switch result {
-            case let .success(product):
-                fulfilledProduct = product
-            case .failure:
-                XCTFail("expected onComplete to succeed")
-            }
-        }
-        XCTAssertFalse(promise.fulfilled)
-        promise.success(product)
-        TestWaiter().wait(for: { promise.fulfilled })
-        XCTAssertEqual(product, fulfilledProduct)
-    }
-
-    func testPromise_fulfillComplete_error() throws {
-        var promise = AsyncTask<Product>()
-
-        var fulfilledError: AsyncError?
-
-        // describe: fulfill promise before error callback is registered
-        promise.failure(AsyncError.testError)
-        promise.onComplete { result in
-            switch result {
-            case .success:
-                XCTFail("Expected onComplete to fail")
-            case let .failure(error):
-                fulfilledError = error as? AsyncError
-            }
-        }
-        TestWaiter().wait(for: { promise.fulfilled })
-        XCTAssertEqual(AsyncError.testError, fulfilledError)
-
-        // describe: register to promise after fulfillment
-        fulfilledError = nil
-        promise.onFailure { e in
-            fulfilledError = e as? AsyncError
-        }
-        // it: should immediately resolve promise
-        XCTAssertEqual(AsyncError.testError, fulfilledError)
-
-        // describe: fulfill promise after error callback is registered
-        fulfilledError = nil
-        promise = AsyncTask<Product>()
-        promise.onComplete { result in
-            switch result {
-            case .success:
-                XCTFail("Expected onComplete to fail")
-            case let .failure(error):
-                fulfilledError = error as? AsyncError
-            }
-        }
-        XCTAssertFalse(promise.fulfilled)
-        promise.failure(AsyncError.testError)
-        TestWaiter().wait(for: { promise.fulfilled })
-        XCTAssertEqual(AsyncError.testError, fulfilledError)
     }
 }

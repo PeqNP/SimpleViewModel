@@ -21,7 +21,7 @@ public protocol ViewModel<Input, Output> {
     
     /// Accept an input from the consumer and respond in kind.
     /// - Throws: When an `Input` throws, `thrownError(_:)` is called with the respective `Error`
-    func accept(_ input: Input, respond: @escaping RespondCallback) throws
+    func accept(_ input: Input, respond: @escaping RespondCallback) async throws
 
     /// Filter `Input` signals from being sent to the `ViewModel` until the respective `Input` operation has finished.
     ///

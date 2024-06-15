@@ -185,15 +185,15 @@ final class SimpleViewModelTests: SimpleTestCase {
         vm.send(.didTapButton)
         
         // it: should filter the `Input`
-        XCTAssertEqual(calledTimes, 1)
+        TestWaiter.wait(for: { calledTimes == 1 })
         
         // describe: finish the `Input`'s operation
         pending.resolver.fulfill(.init(id: "1", name: "Name", price: .single(.regular(10)), skus: []))
-        TestWaiter().wait(for: { !outputs.isEmpty })
+        TestWaiter.wait(for: { outputs.count == 2 })
         vm.send(.didTapButton)
         
         // it: should allow the button to be tapped again
-        XCTAssertEqual(calledTimes, 2)
+        TestWaiter.wait(for: { calledTimes == 2 })
     }
 
     func testViewModel_filterAllInputs() throws {
@@ -218,17 +218,17 @@ final class SimpleViewModelTests: SimpleTestCase {
         vm.send(.didTapButton)
 
         // it: should only call service once
-        XCTAssertEqual(calledTimes, 1)
+        TestWaiter.wait(for: { calledTimes == 1 })
         // it: should filter all `Input`s
-        XCTAssertEqual(outputs.count, 1)
+        TestWaiter.wait(for: { outputs.count == 1 })
 
         // describe: finish the `Input`'s operation
         pending.resolver.fulfill(.init(id: "1", name: "Name", price: .single(.regular(10)), skus: []))
-        TestWaiter().wait(for: { outputs.count == 2 })
+        TestWaiter.wait(for: { outputs.count == 2 })
         vm.send(.didTapOtherButton)
 
         // it: should allow the button to be tapped again
-        XCTAssertEqual(calledTimes, 2)
+        TestWaiter.wait(for: { calledTimes == 2 })
     }
 
     func testViewModel_filterAll() throws {
@@ -253,18 +253,17 @@ final class SimpleViewModelTests: SimpleTestCase {
         vm.send(.didTapButton)
 
         // it: should only call service once
-        XCTAssertEqual(calledTimes, 1)
+        TestWaiter.wait(for: { calledTimes == 1 })
         // it: should filter all `Input`s
-        XCTAssertEqual(outputs.count, 1)
+        TestWaiter.wait(for: { outputs.count == 1 })
 
         // describe: finish the `Input`'s operation
         pending.resolver.fulfill(.init(id: "1", name: "Name", price: .single(.regular(10)), skus: []))
-        TestWaiter().wait(for: { outputs.count == 2 })
+        TestWaiter.wait(for: { outputs.count == 2 })
         vm.send(.didTapOtherButton)
 
         // it: should allow the button to be tapped again
-        XCTAssertEqual(calledTimes, 2)
-        XCTAssertEqual(outputs.count, 2)
+        TestWaiter.wait(for: { calledTimes == 2 })
     }
 
     func testViewModel_thrownError() throws {
@@ -274,8 +273,10 @@ final class SimpleViewModelTests: SimpleTestCase {
         })
 
         vm.send(.didTapEditButton)
-        XCTAssertEqual(outputs.count, 2)
-        XCTAssertEqual(outputs[safe: 1], BarViewModel.Output.showError(String(describing: FakeError.testError)))
+        TestWaiter.wait(for: { outputs.count == 2 })
+        TestWaiter.wait(for: {
+            outputs[safe: 1] == BarViewModel.Output.showError(String(describing: FakeError.testError))
+        })
     }
 
     func testViewModel_debounce() throws {
@@ -291,7 +292,7 @@ final class SimpleViewModelTests: SimpleTestCase {
         vm.send(.didSearch("Chan"))
 
         // Wait 500ms before continuing
-        TestWaiter().wait(for: 0.5)
+        TestWaiter.wait(for: 0.5)
         
         // it: should debounce search requests
         // First: is the initial output, Second is the Output from `didSearch`
@@ -299,6 +300,8 @@ final class SimpleViewModelTests: SimpleTestCase {
         XCTAssertEqual(FooViewModel.Output.products(.init(term: "Chan", products: [1, 2, 3])), outputs[safe: 1])
     }
     
+    /// This shows you how to use the `TestViewModelInterface` which provides a convenient way to perform expectations directly after `send` actions.
+    /// This has not been thoroughly tested using the `async` pattern.
     func testFooViewModel() throws {
         let tester = TestViewModelInterface(viewModel: FooViewModel())
 
@@ -317,9 +320,5 @@ final class SimpleViewModelTests: SimpleTestCase {
 
         // This isn't necessary. If the value from the `send` function is unused, a compiler warning will show, making it immediately obvious that it is missing an expectation.
         tester.finish()
-    }
-
-    func testAsyncRequests() throws {
-        
     }
 }

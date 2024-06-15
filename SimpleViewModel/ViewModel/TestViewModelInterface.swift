@@ -21,21 +21,27 @@ public class TestViewModelInterface<T: ViewModel> {
         }
     }
 
+    @discardableResult
     public func send(_ input: T.Input, file: StaticString = #file, line: UInt = #line) -> Self {
         guard outputs.isEmpty else {
             XCTAssert(false, "Untested outputs encountered from previous `send`", file: file, line: line)
             return self
         }
-        do {
-            try viewModel.accept(input) { [weak self] output in
-                self?.respond(output)
+        let semaphore = DispatchSemaphore(value: 0)
+        Task {
+            do {
+                try await viewModel.accept(input) { [weak self] output in
+                    self?.respond(output)
+                }
             }
-        }
-        catch {
-            viewModel.thrownError(error) { [weak self] output in
-                self?.respond(output)
+            catch {
+                viewModel.thrownError(error) { [weak self] output in
+                    self?.respond(output)
+                }
             }
+            semaphore.signal()
         }
+        semaphore.wait()
         return self
     }
     
@@ -43,7 +49,7 @@ public class TestViewModelInterface<T: ViewModel> {
     ///
     /// If multiple `Output`s are expected, they _must_ be performed at the same time within the same thread.
     public func expect(_ expected: [T.Output], wait seconds: TimeInterval = 2, file: StaticString = #file, line: UInt = #line) {
-        let waiter = TestWaiter(description: "Outputs are equal")
+        let waiter = TestWaiter(description: "Expected outputs to be equal")
         waiter.wait(seconds: seconds, file: file, line: line) { [weak self] in
             !(self?.outputs.isEmpty ?? false)
         }

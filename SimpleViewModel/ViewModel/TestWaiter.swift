@@ -7,6 +7,14 @@ public class TestWaiter {
     private let description: String
     private var finished: () -> Bool = { true }
     
+    public static func wait(for seconds: TimeInterval, file: StaticString = #file, line: UInt = #line) {
+        TestWaiter().wait(for: seconds, file: file, line: line)
+    }
+
+    public static func wait(seconds: TimeInterval = 1, file: StaticString = #file, line: UInt = #line, for finished: @escaping () -> Bool) {
+        TestWaiter().wait(seconds: seconds, file: file, line: line, for: finished)
+    }
+
     public init(description: String = "") {
         self.description = description
     }

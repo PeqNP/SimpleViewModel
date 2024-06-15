@@ -32,13 +32,16 @@ public class ViewModelInterface<T: ViewModel> {
         viewModel.first(respond: respond)
     }
 
-    public func send(_ input: T.Input) {
+    public func send(_ input: T.Input, file: StaticString = #file, line: UInt32 = #line) {
         let name = inputName(for: input)
         var isFiltered = false
         
-        func _send(_ input: T.Input) {
+        @Sendable
+        func _send(_ input: T.Input, isFiltered: Bool) async {
+            log.i("send(\(inputName(for: input))) from \(file):\(line)")
+
             do {
-                try viewModel.accept(input, respond: { [weak self] (output: T.Output) -> Void in
+                try await viewModel.accept(input, respond: { [weak self] (output: T.Output) -> Void in
                     self?.clearFilterStates(for: name, isFiltered: isFiltered)
                     self?.respond(output)
                 })
@@ -83,12 +86,16 @@ public class ViewModelInterface<T: ViewModel> {
         if debouncedInputs.keys.contains(name) {
             let debouncer = debouncedInputs[name]
             debouncer?.debounce {
-                _send(input)
+                Task { [isFiltered] in
+                    await _send(input, isFiltered: isFiltered)
+                }
             }
             return
         }
 
-        _send(input)
+        Task { [isFiltered] in
+            await _send(input, isFiltered: isFiltered)
+        }
     }
 
     private func clearFilterStates(for name: String, isFiltered: Bool) {
