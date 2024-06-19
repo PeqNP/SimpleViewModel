@@ -90,14 +90,14 @@ public class ViewModelInterface<T: ViewModel> {
         if debouncedInputs.keys.contains(name) {
             let debouncer = debouncedInputs[name]
             debouncer?.debounce {
-                Task { [isFiltered] in
+                Task { @MainActor [isFiltered] in
                     await _send(input, isFiltered: isFiltered)
                 }
             }
             return
         }
 
-        Task { [isFiltered] in
+        Task { @MainActor [isFiltered] in
             await _send(input, isFiltered: isFiltered)
         }
     }
