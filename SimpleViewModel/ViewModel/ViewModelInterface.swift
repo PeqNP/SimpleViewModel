@@ -3,6 +3,8 @@
 import Foundation
 
 /// Provides API for view to interact with its respective `ViewModel`
+///
+/// Internally, when async operations take place, the `Task` uses the `@MainActor`. This has the effect of showing the full call stack when receiving an `Output`. It also guarantees that vm operations take place on the main thread.
 public class ViewModelInterface<T: ViewModel> {
     private let viewModel: T
 
@@ -90,6 +92,7 @@ public class ViewModelInterface<T: ViewModel> {
         if debouncedInputs.keys.contains(name) {
             let debouncer = debouncedInputs[name]
             debouncer?.debounce {
+                // Using `MainActor` has the effect of showing the full callstack.
                 Task { @MainActor [isFiltered] in
                     await _send(input, isFiltered: isFiltered)
                 }
@@ -97,6 +100,7 @@ public class ViewModelInterface<T: ViewModel> {
             return
         }
 
+        // Using `MainActor` has the effect of showing the full callstack.
         Task { @MainActor [isFiltered] in
             await _send(input, isFiltered: isFiltered)
         }
