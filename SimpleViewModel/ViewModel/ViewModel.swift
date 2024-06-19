@@ -7,8 +7,13 @@ public enum ViewModelError: Error {
 }
 
 public struct Debounce<Input> {
-    let input: Input
-    let interval: TimeInterval
+    public let input: Input
+    public let interval: TimeInterval
+
+    public init(input: Input, interval: TimeInterval) {
+        self.input = input
+        self.interval = interval
+    }
 }
 
 public protocol ViewModel<Input, Output> {
