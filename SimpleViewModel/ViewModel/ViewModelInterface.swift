@@ -60,6 +60,19 @@ public class ViewModelInterface<T: ViewModel> {
             }
         }
 
+        // Debounce `Input`.
+        // Debouncing takes priority over all other `Input`s. Failing to do will cause certain configurations to never debounce `Input`s.
+        if debouncedInputs.keys.contains(name) {
+            let debouncer = debouncedInputs[name]
+            debouncer?.debounce {
+                // Using `MainActor` has the effect of showing the full callstack.
+                Task { @MainActor [isFiltered] in
+                    await _send(input, isFiltered: isFiltered)
+                }
+            }
+            return
+        }
+
         // Filter all `Input`s if there is any other `Input` in-flight
         if viewModel.filterAll() {
             // An `Input` is currently in-flight
@@ -86,18 +99,6 @@ public class ViewModelInterface<T: ViewModel> {
             }
             isFiltered = true
             filteredInputs[name] = true
-        }
-
-        // Debounce `Input`
-        if debouncedInputs.keys.contains(name) {
-            let debouncer = debouncedInputs[name]
-            debouncer?.debounce {
-                // Using `MainActor` has the effect of showing the full callstack.
-                Task { @MainActor [isFiltered] in
-                    await _send(input, isFiltered: isFiltered)
-                }
-            }
-            return
         }
 
         // Using `MainActor` has the effect of showing the full callstack.
