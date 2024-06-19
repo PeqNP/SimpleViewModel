@@ -44,18 +44,22 @@ public class ViewModelInterface<T: ViewModel> {
         
         @Sendable
         func _send(_ input: T.Input, isFiltered: Bool) async {
-            log.i("send(\(inputName(for: input))) from \(file):\(line)")
+            log.i("send(\(name)) from \(file):\(line)")
 
             do {
                 try await viewModel.accept(input, respond: { [weak self] (output: T.Output) -> Void in
-                    if !filterOutputs.contains(inputName(for: output)) {
+                    let outputName = inputName(for: output)
+                    if filterOutputs.contains(outputName) {
+                        log.i("Filtering Output (\(outputName)) from prematuarely finishing Input (\(name))")
+                    }
+                    else {
                         self?.clearFilterStates(for: name, isFiltered: isFiltered)
                     }
                     self?.respond(output)
                 })
             }
             catch ViewModelError.ignoreInput {
-                log.i("Ignoring input (\(inputName(for: input)))")
+                log.i("Ignoring input (\(name))")
                 clearFilterStates(for: name, isFiltered: isFiltered)
             }
             catch {
