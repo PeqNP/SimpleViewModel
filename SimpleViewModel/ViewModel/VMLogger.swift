@@ -15,7 +15,7 @@ public enum VMLogLevel: Int, Comparable {
 var log = VMLogger(
     name: "VMLogger",
     format: "%name %filename:%line %level - %message",
-    level: .info
+    level: .warning
 )
 
 public class VMLogger {

@@ -182,6 +182,7 @@ class SimpleTestCase: XCTestCase {
     var container: Container!
     
     override func setUp() {
+        VMLogger.setLogLevel(.info)
         // Required for dependency injection
         // This should be done in global `XCTestCase`
         assembly = .init()
@@ -198,7 +199,9 @@ class SimpleTestCase: XCTestCase {
 
 final class SimpleViewModelTests: SimpleTestCase {
 
-    override func setUpWithError() throws { }
+    override func setUpWithError() throws {
+        VMLogger.setLogLevel(.info)
+    }
 
     override func tearDownWithError() throws { }
 

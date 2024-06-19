@@ -83,7 +83,10 @@ private class FakeCartService: CartProvider {
 }
 
 final class SimpleViewModelAsyncTaskTests: SimpleTestCase {
-
+    override func setUpWithError() throws {
+        VMLogger.setLogLevel(.info)
+    }
+    
     func testAsyncRequests() throws {
         let assembly = TestAssembly()
         let cart = FakeCartService()
