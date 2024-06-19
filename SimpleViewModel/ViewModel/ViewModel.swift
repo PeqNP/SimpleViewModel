@@ -48,6 +48,13 @@ public protocol ViewModel<Input, Output> {
     /// Debounce `Input` signals for N seconds
     func debounce() -> [Debounce<Input>]
 
+    /// Ignore `Output`s from setting the state of an `Input` operation to "finished."
+    ///
+    /// Use Case: If filtering an `Input`, and you wish to show a progress bar to indicate that an `Input` is processing, this will filter the "show progress bar" `Output` (e.g. `showProgressBar(current: 0.5)`) from prematurely marking an `Input` operation as being "finished."
+    ///
+    /// When an `Input` operation is "finished", internally this cleans up filtering state allowing other `Input`s to be accepted. If your `Input` operation is in the middle of processing, but you wish to update the view with some type of progress, you may not want other `Input`s from processing!
+    func filterOutputs() -> [Output]
+
     /**
      Returns a callback that can be used for async responses which are not directly related to an input. For example, a view model may listen to the user's signed in status. If a user signs in our out, the view model may want to send commands to the consumer informing them of the state change.
 
@@ -74,4 +81,5 @@ public extension ViewModel {
     func debounce() -> [Debounce<Input>] { [Debounce<Input>]() }
     func responder(respond: @escaping AsyncRespondCallback) { }
     func thrownError(_ error: Error, respond: @escaping RespondCallback) { }
+    func filterOutputs() -> [Output] { [Output]() }
 }

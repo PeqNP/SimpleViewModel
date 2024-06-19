@@ -36,6 +36,10 @@ public class ViewModelInterface<T: ViewModel> {
 
     public func send(_ input: T.Input, file: StaticString = #file, line: UInt32 = #line) {
         let name = inputName(for: input)
+        let filterOutputs = viewModel.filterOutputs().map { (output: T.Output) -> String in
+            inputName(for: output)
+        }
+
         var isFiltered = false
         
         @Sendable
@@ -44,7 +48,9 @@ public class ViewModelInterface<T: ViewModel> {
 
             do {
                 try await viewModel.accept(input, respond: { [weak self] (output: T.Output) -> Void in
-                    self?.clearFilterStates(for: name, isFiltered: isFiltered)
+                    if !filterOutputs.contains(inputName(for: output)) {
+                        self?.clearFilterStates(for: name, isFiltered: isFiltered)
+                    }
                     self?.respond(output)
                 })
             }

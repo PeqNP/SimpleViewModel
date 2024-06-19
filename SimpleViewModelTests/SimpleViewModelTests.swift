@@ -27,6 +27,7 @@ private struct FooViewModel: ViewModel {
         case state(State)
         case products(ProductSearch)
         case showError(String)
+        case showProgress(current: Double)
     }
 
     struct State: Equatable {
@@ -47,7 +48,12 @@ private struct FooViewModel: ViewModel {
     func debounce() -> [Debounce<Input>] {
         [.init(input: .didSearch(""), interval: 0.3)]
     }
-    
+
+    /// The `showProgress` `Output` will not put the `Input` operation in a "finished" state. This prevents other `Input`s from being accepted.
+    func filterOutputs() -> [Output] {
+        [.showProgress(current: 0)]
+    }
+
     func first(respond: (Output) -> Void) {
         respond(.state(.init(id: "5", name: "Foo")))
     }
@@ -65,6 +71,49 @@ private struct FooViewModel: ViewModel {
                 }
         case let .didSearch(term):
             respond(.products(.init(term: term, products: [1, 2, 3])))
+        }
+    }
+}
+
+/// This shows how to filter `Output`s to prevent `Input` operations from being prematurely considered "finished."
+private struct OutputTestViewModel: ViewModel {
+    enum Input {
+        case didTapButton
+    }
+
+    enum Output: Equatable {
+        case state(State)
+        case showProgress(current: Double)
+    }
+
+    struct State: Equatable {
+        let id: String
+        let name: String
+    }
+
+    @Dependency var product: ProductService!
+
+    /// Button taps are filtered until the first `Input` operation has "finished"
+    func filter() -> [Input] {
+        [.didTapButton]
+    }
+
+    /// The `showProgress` `Output` will not put the `Input` operation in a "finished" state. This prevents other `Input`s from being accepted.
+    func filterOutputs() -> [Output] {
+        [.showProgress(current: 0)]
+    }
+
+    func accept(_ input: Input, respond: @escaping (Output) -> Void) {
+        switch input {
+        case .didTapButton:
+            respond(.showProgress(current: 0.1))
+            product.product(for: "10")
+                .done { product in
+                    respond(.state(.init(id: product.id, name: product.name)))
+                }
+                .catch { _ in
+                    // Ignoring as catching an error is out of scope for this example
+                }
         }
     }
 }
@@ -320,5 +369,39 @@ final class SimpleViewModelTests: SimpleTestCase {
 
         // This isn't necessary. If the value from the `send` function is unused, a compiler warning will show, making it immediately obvious that it is missing an expectation.
         tester.finish()
+    }
+
+    func testFilterOutputs() throws {
+        var calledTimes = 0
+        let product = container.force(ProductService.self)
+        let pending = Promise<Product>.pending()
+
+        product.product = { id in
+            calledTimes += 1
+            return pending.promise
+        }
+
+        var outputs = [OutputTestViewModel.Output]()
+        let vm = ViewModelInterface(viewModel: OutputTestViewModel(), receive: { output in
+            outputs.append(output)
+        })
+
+        // describe: tap button to load `Product`s
+        vm.send(.didTapButton)
+
+        // it: should return progress
+        let expected: [OutputTestViewModel.Output] = [
+            .showProgress(current: 0.1)
+        ]
+        TestWaiter.wait(for: { outputs == expected })
+        XCTAssertEqual(calledTimes, 1)
+
+        // describe: send another button tap
+        vm.send(.didTapButton)
+
+        // it: should not send another progress update
+        // Because the last `Output` is ignored, the first `didTapButton` is still in progress
+        TestWaiter.wait(for: { outputs == expected })
+        XCTAssertEqual(calledTimes, 1)
     }
 }
