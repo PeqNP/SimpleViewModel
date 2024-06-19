@@ -8,17 +8,25 @@ A simple, robust, view model pattern.
 Additional benefits:
 
 - Know where a signal originates from. Avoid the "infinite sink" problem when debugging (e.g. `RxSwift`).
+  - In order to support `async` all `Input` signals are now executed on a thread using `Task`. Additional logging facilities have been added to indicate where a signal originates. You may also place a breakpoint in `ViewModelInterface.send(...)` to interrogate the call stack.
 - Pass-thru child signals to parent view models with ease. No complicated wiring. Use delegation, a pattern that has been used for decades. Refer to `ProductViewController` for an example.
 - Debounce and filter signals to your view model.
 - `TestWaiter` provides a flexible way to wait for conditions to occur before the test continues. Useful for asynchronous calls.
 
 The sample project also provides several examples for the following patterns:
 
-- Dependency injection. Use `Swinject` and the `@Dependency` property wrapper. Refer to `ProductViewModel` for an example.
-- Protocol witness pattern used for stubbing network requests. Please refer to the `ProductService` class, within the sample project, for an example.
-- Network to domain transform
+- Dependency injection. Use `Swinject` and the `@Dependency` property wrapper. Refer to `ProductViewModel`.
+- Protocol witness pattern used for stubbing network requests. Refer to `ProductService`.
+- Protocol oriented pattern. Refer to `SimpleViewModelAsyncTaskTests`.
+- Network to domain transform. Refer to `ProductService` and search for `extension SKU` to see how a network response is transformed into domain model.
 - Project organization. The organization of this project has worked for very large iOS teams. Every group such as `App`, `Domain`, `Foundation`, etc. would be their own module.
+- `async` library for network calls. Refer to `SimpleViewModelAsyncTests`.
+- Consolidated error handling via `thrownError`. Refer to `SimpleViewModelAsyncTests`. It's the last test in the first test function.
 - A handful of helpful extensions for `Array`, `UIView`, etc.
+- Easily filter signals in a variety of ways. You can configure your view model to:
+  - allow only one `Input` to be processed at a time via `filterAll() -> Bool`
+  - ignore repeated `Input`s from processing until first `Input` has finished via `filter() -> [Input]`. Usage: If a button makes a network request and must wait until request is finished.
+  - allow speific `Input` to filter all other `Input`s until its operation has finished. Usage: Adding an item to your bag and ignore all `Input`s operation is finished.
 
 ## Introduction
 
@@ -28,10 +36,10 @@ This view model illustrates how to:
 
 - Filter signals from button taps
 - Debounce signals from text entry
-- Makes network requsts to query and search for products
+- Makes network requsts to query and search for products using a protocol witness
 - Injects dependencies
 - Transforms domain model to view model
-- Returns error states that the VC can show to the user
+- Returns an `Error` that the VC may show to the user
 
 ```swift
 // file: MyViewModel.swift
@@ -54,17 +62,17 @@ struct FooViewModel: ViewModel {
     }
 
     @Dependency var product: ProductService!
-    
+
     // Wait for the product to be retrieved from server before allowing the button to be tapped again
     func filter() -> [Input] {
         [.didTapButton]
     }
-    
+
     // When searching for a product, wait 300ms
     func debounce() -> [(Input, TimeInterval)] {
-        [(.didSearch(""), 0.3)]
+        [.init(input: .didSearch(""), interval: 0.3)]
     }
-    
+
     func first(respond: (Output) -> Void) {
         respond(.state(.init(id: "5", name: "Foo")))
     }
@@ -93,7 +101,7 @@ struct FooViewModel: ViewModel {
 }
 ```
 
-Testing the `FooViewModel`.
+## Testing the `FooViewModel`
 
 ```swift
 // file: FooViewModelTests.swift
@@ -106,7 +114,7 @@ final class FooViewModelTests: SimpleTestCase {
     override func setUpWithError() throws { }
 
     override func tearDownWithError() throws { }
-    
+
     func testFooViewModel() throws {
         let tester = TestViewModelInterface(viewModel: FooViewModel())
 
@@ -115,7 +123,7 @@ final class FooViewModelTests: SimpleTestCase {
         tester.expect([
             .state(.init(id: "5", name: "Foo"))
         ])
-        
+
         // Stub a networking service. Please refer to the sample project for more context.
         let product = container.force(ProductService.self)
         product.product = { id in
@@ -135,6 +143,8 @@ final class FooViewModelTests: SimpleTestCase {
     }
 }
 ```
+
+## Further Reading
 
 To see how you can wire signals between child and parent, refer to the `ProductViewController` and the `SKUView`. Instead of the parent `ViewModel` having a reference to the child `ViewModel` (as in the Composable Architecture) you configure signaling to occur via delegation.
 

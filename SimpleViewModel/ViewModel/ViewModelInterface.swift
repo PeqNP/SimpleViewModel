@@ -46,6 +46,10 @@ public class ViewModelInterface<T: ViewModel> {
                     self?.respond(output)
                 })
             }
+            catch ViewModelError.ignoreInput {
+                log.i("Ignoring input (\(inputName(for: input)))")
+                clearFilterStates(for: name, isFiltered: isFiltered)
+            }
             catch {
                 viewModel.thrownError(error, respond: { [weak self] (output: T.Output) in
                     self?.clearFilterStates(for: name, isFiltered: isFiltered)

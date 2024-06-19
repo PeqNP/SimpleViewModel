@@ -2,6 +2,10 @@
 
 import Foundation
 
+public enum ViewModelError: Error {
+    case ignoreInput
+}
+
 public struct Debounce<Input> {
     let input: Input
     let interval: TimeInterval
