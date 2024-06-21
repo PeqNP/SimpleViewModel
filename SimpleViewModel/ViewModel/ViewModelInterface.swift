@@ -31,7 +31,9 @@ public class ViewModelInterface<T: ViewModel> {
         viewModel.responder { [weak self] (output: T.Output) -> Void in
             self?.respond(output)
         }
-        viewModel.first(respond: respond)
+        viewModel.first { [weak self] (output: T.Output) -> Void in
+            self?.respond(output)
+        }
     }
 
     public func send(_ input: T.Input, file: StaticString = #file, line: UInt32 = #line) {
